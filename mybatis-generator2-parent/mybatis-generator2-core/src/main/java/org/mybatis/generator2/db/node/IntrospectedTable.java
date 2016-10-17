@@ -48,6 +48,10 @@ public class IntrospectedTable {
         return columns.values().stream().anyMatch(IntrospectedColumn::isBlobColumn);
     }
 
+    public Stream<IntrospectedColumn> getBaseColumns() {
+        return columns.values().stream().filter(IntrospectedColumn::isBaseColumn);
+    }
+
     public boolean hasBaseColumns() {
         return columns.values().stream().anyMatch(IntrospectedColumn::isBaseColumn);
     }
@@ -94,11 +98,9 @@ public class IntrospectedTable {
 
         introspectedTable.columns.put(introspectedColumn.getColumnName(), introspectedColumn);
 
-        if (logger.isTraceEnabled()) {
-            logger.trace(getString(MessageId.TRACING_2,
-                    introspectedColumn.getColumnName(), introspectedColumn.getDataType(),
-                    introspectedTable.getFullTableName()));
-        }
+        logger.trace(() -> getString(MessageId.TRACING_2,
+                introspectedColumn.getColumnName(), introspectedColumn.getDataType(),
+                introspectedTable.getFullTableName()));
     }
 
     private static void calculatePrimaryKey(FullTableName fullTableName, DatabaseMetaData databaseMetaData,
@@ -128,7 +130,7 @@ public class IntrospectedTable {
         });
         
         if (!column.isPresent()) {
-            logger.warn(getString(MessageId.WARNING_29, columnName, introspectedTable));
+            logger.warn(() -> getString(MessageId.WARNING_29, columnName, introspectedTable));
         }
     }
 }

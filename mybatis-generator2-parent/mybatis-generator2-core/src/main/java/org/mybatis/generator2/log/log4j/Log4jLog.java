@@ -13,9 +13,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.mybatis.generator2.log;
+package org.mybatis.generator2.log.log4j;
+
+import java.util.function.Supplier;
 
 import org.apache.log4j.Logger;
+import org.mybatis.generator2.log.Log;
 
 /**
  * 
@@ -31,37 +34,31 @@ public class Log4jLog implements Log {
     }
 
     @Override
-    public boolean isDebugEnabled() {
-        return log.isDebugEnabled();
+    public void error(Supplier<String> s, Throwable e) {
+        log.error(s.get(), e);
     }
 
     @Override
-    public boolean isTraceEnabled() {
-        return log.isTraceEnabled();
+    public void error(Supplier<String> s) {
+        log.error(s.get());
     }
 
     @Override
-    public void error(String s, Throwable e) {
-        log.error(s, e);
+    public void debug(Supplier<String> s) {
+        if (log.isDebugEnabled()) {
+            log.debug(s.get());
+        }
     }
 
     @Override
-    public void error(String s) {
-        log.error(s);
+    public void warn(Supplier<String> s) {
+        log.warn(s.get());
     }
 
     @Override
-    public void debug(String s) {
-        log.debug(s);
-    }
-
-    @Override
-    public void warn(String s) {
-        log.warn(s);
-    }
-
-    @Override
-    public void trace(String s) {
-        log.trace(s);
+    public void trace(Supplier<String> s) {
+        if (log.isTraceEnabled()) {
+            log.trace(s.get());
+        }
     }
 }

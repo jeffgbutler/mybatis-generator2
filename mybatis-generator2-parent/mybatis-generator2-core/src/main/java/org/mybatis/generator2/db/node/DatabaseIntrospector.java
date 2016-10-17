@@ -40,25 +40,25 @@ public class DatabaseIntrospector {
     }
 
     private void introspectTable(TableConfiguration tc) throws SQLException {
-        String catalog;
-        String schemaPattern;
-        String tableNamePattern;
         DatabaseCapabilities capabilities = DatabaseCapabilities.from(databaseMetaData);
 
-        catalog = conformNameToDatabase(tc.getCatalog(), tc.isDelimitIdentifiers(), capabilities);
-        schemaPattern = conformNameToDatabase(tc.getSchemaPattern(), tc.isDelimitIdentifiers(), capabilities);
-        tableNamePattern = conformNameToDatabase(tc.getTableNamePattern(), tc.isDelimitIdentifiers(), capabilities);
+        String catalog = conformNameToDatabase(tc.getCatalog(), tc.isDelimitIdentifiers(), capabilities);
+        String schemaPattern = conformNameToDatabase(tc.getSchemaPattern(), tc.isDelimitIdentifiers(), capabilities);
+        String tableNamePattern = conformNameToDatabase(tc.getTableNamePattern(), tc.isDelimitIdentifiers(), capabilities);
 
+        String escapedSchemaPattern;
+        String escapedTableNamePattern;
         if (tc.isWildcardEscapingEnabled()) {
-            schemaPattern = escapeWildcards(schemaPattern, capabilities);
-            tableNamePattern = escapeWildcards(tableNamePattern, capabilities);
+            escapedSchemaPattern = escapeWildcards(schemaPattern, capabilities);
+            escapedTableNamePattern = escapeWildcards(tableNamePattern, capabilities);
+        } else {
+            escapedSchemaPattern = schemaPattern;
+            escapedTableNamePattern = tableNamePattern;
         }
 
-        if (logger.isTraceEnabled()) {
-            logger.trace(getString(MessageId.TRACING_6, catalog, schemaPattern, tableNamePattern));
-        }
+        logger.trace(() -> getString(MessageId.TRACING_6, catalog, escapedSchemaPattern, escapedTableNamePattern));
 
-        List<FullTableName> tables = getTables(catalog, schemaPattern, tableNamePattern);
+        List<FullTableName> tables = getTables(catalog, escapedSchemaPattern, escapedTableNamePattern);
         for (FullTableName table : tables) {
             IntrospectedTable introspectedTable = IntrospectedTable.from(table, databaseMetaData);
             introspectionContext.addTable(introspectedTable);
@@ -82,14 +82,13 @@ public class DatabaseIntrospector {
         st = new StringTokenizer(pattern, "_%", true); //$NON-NLS-1$
         while (st.hasMoreTokens()) {
             String token = st.nextToken();
-            if (token.equals("_") //$NON-NLS-1$
-                    || token.equals("%")) { //$NON-NLS-1$
+            if ("_".equals(token) //$NON-NLS-1$
+                    || "%".equals(token)) { //$NON-NLS-1$
                 sb.append(capabilities.getSearchStringEscape());
             }
             sb.append(token);
         }
-        pattern = sb.toString();
-        return pattern;
+        return sb.toString();
     }
 
     private String conformNameToDatabase(String name, boolean forceDelimit, DatabaseCapabilities capabilities) {
@@ -126,13 +125,13 @@ public class DatabaseIntrospector {
     private List<FullTableName> handleResultSet(ResultSet rs) throws SQLException {
         List<FullTableName> tables = new ArrayList<>();
         while (rs.next()) {
-            tables.add(handleRow(tables, rs));
+            tables.add(handleRow(rs));
         }
         
         return tables;
     }
 
-    private FullTableName handleRow(List<FullTableName> tables, ResultSet rs) throws SQLException {
+    private FullTableName handleRow(ResultSet rs) throws SQLException {
         String catalog = rs.getString("TABLE_CAT"); //$NON-NLS-1$
         String schema = rs.getString("TABLE_SCHEM"); //$NON-NLS-1$
         String tableName = rs.getString("TABLE_NAME"); //$NON-NLS-1$
@@ -140,9 +139,7 @@ public class DatabaseIntrospector {
 
         FullTableName fullTableName = FullTableName.from(catalog, schema, tableName, remarks);
 
-        if (logger.isTraceEnabled()) {
-            logger.trace(getString(MessageId.TRACING_5, fullTableName)); //$NON-NLS-1$
-        }
+        logger.trace(() -> getString(MessageId.TRACING_5, fullTableName)); //$NON-NLS-1$
         
         return fullTableName;
     }

@@ -33,14 +33,25 @@ public class IntrospectedColumn {
     }
 
     public boolean isBlobColumn() {
-        return dataType == Types.BINARY
-               || dataType == Types.BLOB
-               || dataType == Types.CLOB
-               || dataType == Types.LONGNVARCHAR
-               || dataType == Types.LONGVARBINARY
-               || dataType == Types.LONGVARCHAR
-               || dataType == Types.VARBINARY
-               || dataType == Types.NCLOB;
+        boolean isBlob;
+
+        switch(dataType) {
+        case Types.BINARY:
+        case Types.BLOB:
+        case Types.CLOB:
+        case Types.LONGNVARCHAR:
+        case Types.LONGVARBINARY:
+        case Types.LONGVARCHAR:
+        case Types.VARBINARY:
+        case Types.NCLOB:
+            isBlob = true;
+            break;
+            
+        default:
+            isBlob = false;
+        }
+        
+        return isBlob;
     }
     
     public boolean isBaseColumn() {

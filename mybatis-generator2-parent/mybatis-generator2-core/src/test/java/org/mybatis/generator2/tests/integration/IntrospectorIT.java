@@ -5,6 +5,7 @@ import static org.junit.Assert.assertThat;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
 
 import org.junit.Test;
 import org.mybatis.generator2.config.Context;
@@ -16,7 +17,7 @@ import org.mybatis.generator2.testutils.TestUtils;
 public class IntrospectorIT {
 
     @Test
-    public void testIntrospector() throws Exception {
+    public void testIntrospector() throws SQLException {
         TestUtils.createTestDatabase();
 
         Context context = new Context();
@@ -27,14 +28,25 @@ public class IntrospectorIT {
 
         context.addTable(configuration);
 
-        try (Connection connection = TestUtils.getConnection()) {
+        IntrospectionContext iContext;
+        try (Connection connection = TestUtils.getConnectionToTestDatabase()) {
             DatabaseMetaData dbmd = connection.getMetaData();
             
             DatabaseIntrospector introspector = DatabaseIntrospector.from(context, dbmd);
 
             introspector.introspectTables();
-            IntrospectionContext iContext = introspector.getIntrospectionContext();
-            assertThat(iContext.getTables().count(), is(1L));
+            iContext = introspector.getIntrospectionContext();
         }
+
+        assertThat(iContext.getTables().count(), is(1L));
+        iContext.getTables().forEach(t -> {
+            assertThat(t.hasAnyColumns(), is(true));
+            assertThat(t.getAllColumns().count(), is(5L));
+            assertThat(t.hasPrimaryKey(), is(true));
+            assertThat(t.getPrimaryKeyColumns().count(), is(1L));
+            assertThat(t.hasBlobColumns(), is(false));
+            assertThat(t.hasBaseColumns(), is(true));
+            assertThat(t.getBaseColumns().count(), is(4L));
+        });
     }
 }

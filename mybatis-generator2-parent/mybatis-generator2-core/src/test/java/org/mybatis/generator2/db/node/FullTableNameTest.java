@@ -1,6 +1,8 @@
 package org.mybatis.generator2.db.node;
 
-import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNot.*;
+import static org.hamcrest.core.Is.*;
+import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 
@@ -46,5 +48,24 @@ public class FullTableNameTest {
         assertThat(fullTableName.getSchema(), is("schema1"));
         assertThat(fullTableName.getTableName(), is("table1"));
         assertThat(fullTableName.getRemarks(), is("some remarks"));
+    }
+
+    @Test
+    public void testEquals() {
+        FullTableName fullTableName1 = FullTableName.from(null, "schema1", "table1", null);
+        FullTableName fullTableName2 = FullTableName.from(null, "schema1", "table1", null);
+        assertThat(fullTableName1, is(equalTo(fullTableName2)));
+    }
+
+    @Test
+    public void testEqualsWithNull() {
+        FullTableName fullTableName1 = FullTableName.from(null, "schema1", "table1", null);
+        assertThat(fullTableName1, is(not(equalTo(nullValue()))));
+    }
+
+    @Test
+    public void testEqualsWithString() {
+        FullTableName fullTableName1 = FullTableName.from(null, "schema1", "table1", null);
+        assertThat(fullTableName1, is(not(equalTo("fred"))));
     }
 }

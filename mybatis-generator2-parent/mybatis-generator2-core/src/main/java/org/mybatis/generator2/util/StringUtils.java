@@ -1,9 +1,9 @@
 package org.mybatis.generator2.util;
 
-public class StringUtils {
+public interface StringUtils {
 
     public static boolean stringHasValue(String s) {
-        return s != null && s.length() > 0;
+        return s != null && s.trim().length() > 0;
     }
 
     public static boolean stringContainsSQLWildcard(String s) {

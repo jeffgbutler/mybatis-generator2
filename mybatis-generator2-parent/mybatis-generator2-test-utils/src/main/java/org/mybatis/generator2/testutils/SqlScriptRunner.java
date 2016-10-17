@@ -44,65 +44,48 @@ public class SqlScriptRunner {
     private SqlScriptRunner() {
     }
 
-    public void executeScript() throws Exception {
-
-        Connection connection = null;
-
+    public void executeScript() {
+        loadDriver();
+        
+        try (Connection connection = DriverManager.getConnection(jdbcUrl, userid, password)) {
+            executeScript(connection);
+            connection.commit();
+        } catch (SQLException | IOException e) {
+            throw new TestUtilsException("Exception loading JDBC driver", e);
+        }
+    }
+    
+    private void loadDriver() {
         try {
             Class.forName(jdbcDriver);
-            connection = DriverManager.getConnection(jdbcUrl, userid, password);
-
-            Statement statement = connection.createStatement();
-
-            BufferedReader br = getScriptReader();
-
+        } catch (ClassNotFoundException e) {
+            throw new TestUtilsException("Exception loading JDBC driver", e);
+        }
+    }
+    
+    private void executeScript(Connection connection) throws SQLException, IOException {
+        try (Statement statement = connection.createStatement()) {
+            executeScript(statement);
+        }
+    }
+    
+    private void executeScript(Statement statement) throws IOException, SQLException {
+        try (BufferedReader br = getScriptReader()) {
             String sql;
 
             while ((sql = readStatement(br)) != null) {
                 statement.execute(sql);
             }
-
-            closeStatement(statement);
-            connection.commit();
-            br.close();
-        } finally {
-            closeConnection(connection);
-        }
-    }
-
-    private void closeConnection(Connection connection) {
-        if (connection != null) {
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                // ignore
-                ;
-            }
-        }
-    }
-
-    private void closeStatement(Statement statement) {
-        if (statement != null) {
-            try {
-                statement.close();
-            } catch (SQLException e) {
-                // ignore
-                ;
-            }
         }
     }
 
     private String readStatement(BufferedReader br) throws IOException {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         String line;
 
         while ((line = br.readLine()) != null) {
-            if (line.startsWith("--")) { //$NON-NLS-1$
-                continue;
-            }
-
-            if (line == null || line.length() == 0) {
+            if (line.length() == 0 || line.startsWith("--")) { //$NON-NLS-1$
                 continue;
             }
 
@@ -120,22 +103,16 @@ public class SqlScriptRunner {
         return s.length() > 0 ? s : null;
     }
     
-    private BufferedReader getScriptReader() throws Exception {
+    private BufferedReader getScriptReader() throws IOException {
         BufferedReader answer;
         
         if (sqlScript.startsWith("classpath:")) {
             String resource = sqlScript.substring("classpath:".length());
             InputStream is = 
                 Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);
-            if (is == null) {
-                throw new Exception("SQL script file does not exist: " + resource);
-            }
             answer = new BufferedReader(new InputStreamReader(is));
         } else {
             File file = new File(sqlScript);
-            if (!file.exists()) {
-                throw new Exception("SQL script file does not exist");
-            }
             answer = new BufferedReader(new FileReader(file));
         }
         

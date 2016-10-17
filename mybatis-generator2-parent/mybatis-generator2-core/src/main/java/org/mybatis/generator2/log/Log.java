@@ -15,22 +15,17 @@
  */
 package org.mybatis.generator2.log;
 
-/**
- * 
- * @author Clinton Begin
- */
+import java.util.function.Supplier;
+
 public interface Log {
 
-    boolean isDebugEnabled();
-    boolean isTraceEnabled();
+    void error(Supplier<String> s, Throwable e);
 
-    void error(String s, Throwable e);
+    void error(Supplier<String> s);
 
-    void error(String s);
+    void debug(Supplier<String> s);
 
-    void debug(String s);
-
-    void warn(String s);
+    void warn(Supplier<String> s);
     
-    void trace(String s);
+    void trace(Supplier<String> s);
 }

@@ -37,8 +37,8 @@ public class ObjectFactory {
     private static List<ClassLoader> resourceClassLoaders;
     
     static {
-    	externalClassLoaders = new ArrayList<ClassLoader>();
-        resourceClassLoaders = new ArrayList<ClassLoader>();
+    	externalClassLoaders = new ArrayList<>();
+        resourceClassLoaders = new ArrayList<>();
     }
     
     /**
@@ -105,7 +105,7 @@ public class ObjectFactory {
             try {
                 clazz = Class.forName(type, true, classLoader);
                 return clazz;
-            } catch (Throwable e) {
+            } catch (ClassNotFoundException e) {
                 // ignore - fail safe below
             }
         }
@@ -126,7 +126,7 @@ public class ObjectFactory {
         try {
             Class<?> clazz = externalClassForName(type);
             answer = clazz.newInstance();
-        } catch (Exception e) {
+        } catch (ReflectiveOperationException e) {
             throw new RuntimeException(getString(MessageId.RUNTIME_ERROR_6, type), e);
         }
 
@@ -149,7 +149,7 @@ public class ObjectFactory {
         try {
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
             clazz = Class.forName(type, true, cl);
-        } catch (Exception e) {
+        } catch (ClassNotFoundException e) {
             // ignore - failsafe below
         }
 
@@ -199,9 +199,8 @@ public class ObjectFactory {
 
         try {
             Class<?> clazz = internalClassForName(type);
-
             answer = clazz.newInstance();
-        } catch (Exception e) {
+        } catch (ReflectiveOperationException e) {
             throw new RuntimeException(getString(MessageId.RUNTIME_ERROR_6, type), e);
         }
 

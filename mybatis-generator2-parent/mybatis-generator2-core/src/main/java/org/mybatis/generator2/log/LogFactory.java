@@ -15,11 +15,10 @@
  */
 package org.mybatis.generator2.log;
 
-import static org.mybatis.generator2.util.Messages.getString;
-
-import org.mybatis.generator2.util.Messages.MessageId;
-import org.mybatis.generator2.util.ObjectFactory;
-
+import org.mybatis.generator2.log.jdk.JdkLoggingLogFactory;
+import org.mybatis.generator2.log.log4j.Log4jLoggingLogFactory;
+import org.mybatis.generator2.log.log4j2.Log4j2LoggingLogFactory;
+import org.mybatis.generator2.log.slf4j.Slf4jLoggingLogFactory;
 
 /**
  * Factory for creating loggers. Uses runtime introspection to determine the
@@ -29,24 +28,48 @@ import org.mybatis.generator2.util.ObjectFactory;
  * 
  */
 public class LogFactory {
-    private static AbstractLogFactory logFactory;
+    private static AbstractLogFactory abstractLogFactory;
 
     static {
+        trySlf4j();
+        tryLog4j2();
+        tryLog4j();
+        tryJdk();
+    }
+    
+    private static void trySlf4j() {
+        tryCandidate(Slf4jLoggingLogFactory.class);
+    }
+    
+    private static void tryLog4j2() {
+        tryCandidate(Log4j2LoggingLogFactory.class);
+    }
+
+    private static void tryLog4j() {
+        tryCandidate(Log4jLoggingLogFactory.class);
+    }
+
+    private static void tryJdk() {
+        tryCandidate(JdkLoggingLogFactory.class);
+    }
+
+    private static void tryCandidate(Class<? extends AbstractLogFactory> candidate) {
+        if (abstractLogFactory != null) {
+            return;
+        }
+        
         try {
-            ObjectFactory.internalClassForName("org.apache.log4j.Logger"); //$NON-NLS-1$
-            logFactory = new Log4jLoggingLogFactory();
+            AbstractLogFactory candidateFactory = candidate.newInstance();
+            Log log = candidateFactory.getLog(LogFactory.class);
+            log.debug(() -> "Initialized Logging with " + candidate.getName());
+            abstractLogFactory = candidateFactory;
         } catch (Exception e) {
-            logFactory = new JdkLoggingLogFactory();
+            // ignore - try the next thing
         }
     }
 
     public static Log getLog(Class<?> clazz) {
-        try {
-            return logFactory.getLog(clazz);
-        } catch (Throwable t) {
-            throw new RuntimeException(getString(MessageId.RUNTIME_ERROR_21,
-                    clazz.getName(), t.getMessage()), t);
-        }
+        return abstractLogFactory.getLog(clazz);
     }
 
     /**
@@ -57,23 +80,11 @@ public class LogFactory {
      * method. If you intend to use this method you should call it before
      * calling any other method.
      */
-    public static synchronized void forceJavaLogging() {
-        logFactory = new JdkLoggingLogFactory();
-    }
-
-    private static class JdkLoggingLogFactory implements AbstractLogFactory {
-        public Log getLog(Class<?> clazz) {
-            return new JdkLog(clazz);
-        }
-    }
-
-    private static class Log4jLoggingLogFactory implements AbstractLogFactory {
-        public Log getLog(Class<?> clazz) {
-            return new Log4jLog(clazz);
-        }
+    public static void forceJavaLogging() {
+        abstractLogFactory = new JdkLoggingLogFactory();
     }
 
     public static void setLogFactory(AbstractLogFactory logFactory) {
-        LogFactory.logFactory = logFactory;
+        LogFactory.abstractLogFactory = logFactory;
     }
 }
