@@ -16,6 +16,8 @@
 package org.mybatis.generator2.log;
 
 import static org.mybatis.generator2.util.Messages.getString;
+
+import org.mybatis.generator2.util.Messages.MessageId;
 import org.mybatis.generator2.util.ObjectFactory;
 
 
@@ -42,7 +44,7 @@ public class LogFactory {
         try {
             return logFactory.getLog(clazz);
         } catch (Throwable t) {
-            throw new RuntimeException(getString("RuntimeError.21", //$NON-NLS-1$
+            throw new RuntimeException(getString(MessageId.RUNTIME_ERROR_21,
                     clazz.getName(), t.getMessage()), t);
         }
     }

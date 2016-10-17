@@ -21,6 +21,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.mybatis.generator2.util.Messages.MessageId;
+
 /**
  * This class creates the different objects needed by the generator.
  *
@@ -125,8 +127,7 @@ public class ObjectFactory {
             Class<?> clazz = externalClassForName(type);
             answer = clazz.newInstance();
         } catch (Exception e) {
-            throw new RuntimeException(getString(
-                    "RuntimeError.6", type), e); //$NON-NLS-1$
+            throw new RuntimeException(getString(MessageId.RUNTIME_ERROR_6, type), e);
         }
 
         return answer;
@@ -201,9 +202,7 @@ public class ObjectFactory {
 
             answer = clazz.newInstance();
         } catch (Exception e) {
-            throw new RuntimeException(getString(
-                    "RuntimeError.6", type), e); //$NON-NLS-1$
-
+            throw new RuntimeException(getString(MessageId.RUNTIME_ERROR_6, type), e);
         }
 
         return answer;

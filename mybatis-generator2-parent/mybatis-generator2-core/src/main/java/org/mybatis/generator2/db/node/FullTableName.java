@@ -1,11 +1,13 @@
 package org.mybatis.generator2.db.node;
 
-import static org.mybatis.generator2.util.StringUtils.composeFullyQualifiedTableName;
+import static org.mybatis.generator2.util.StringUtils.stringHasValue;
 
 public class FullTableName {
     private String tableName;
     private String catalog;
     private String schema;
+    private String remarks;
+    private String fullyQualifiedTableName;
 
     private FullTableName() {
     }
@@ -28,39 +30,52 @@ public class FullTableName {
             return false;
         }
 
-        return obj.toString().equals(this.toString());
+        return ((FullTableName) obj).fullyQualifiedTableName.equals(this.fullyQualifiedTableName);
     }
 
     @Override
     public int hashCode() {
-        return composeFullyQualifiedTableName(catalog, schema, tableName, '.').hashCode();
+        return fullyQualifiedTableName.hashCode();
     }
 
     @Override
     public String toString() {
-        return composeFullyQualifiedTableName(catalog, schema, tableName, '.');
+        return fullyQualifiedTableName;
+    }
+
+    private void updateFullyQualifiedTableName() {
+        StringBuilder sb = new StringBuilder();
+
+        if (stringHasValue(catalog)) {
+            sb.append(catalog);
+            sb.append('.');
+        }
+
+        if (stringHasValue(schema)) {
+            sb.append(schema);
+            sb.append('.');
+        } else {
+            if (sb.length() > 0) {
+                sb.append('.');
+            }
+        }
+
+        sb.append(tableName);
+
+        fullyQualifiedTableName = sb.toString();
     }
     
-    public static class Builder {
-        private FullTableName fullTableName = new FullTableName();
-        
-        public Builder withTableName(String tableName) {
-            fullTableName.tableName = tableName;
-            return this;
-        }
+    public String getRemarks() {
+        return remarks;
+    }
 
-        public Builder withSchema(String schema) {
-            fullTableName.schema = schema;
-            return this;
-        }
-
-        public Builder withCatalog(String catalog) {
-            fullTableName.catalog = catalog;
-            return this;
-        }
-        
-        public FullTableName build() {
-            return fullTableName;
-        }
+    public static FullTableName from(String catalog, String schema, String tableName, String remarks) {
+        FullTableName fullTableName = new FullTableName();
+        fullTableName.catalog = catalog;
+        fullTableName.schema = schema;
+        fullTableName.tableName = tableName;
+        fullTableName.remarks = remarks;
+        fullTableName.updateFullyQualifiedTableName();
+        return fullTableName;
     }
 }

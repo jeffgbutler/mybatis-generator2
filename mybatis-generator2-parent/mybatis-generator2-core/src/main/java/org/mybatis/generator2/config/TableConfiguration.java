@@ -49,6 +49,11 @@ public class TableConfiguration {
             return this;
         }
         
+        public Builder withWildcardEscapingEnabled(boolean wildcardEscapingEnabled) {
+            configuration.wildcardEscapingEnabled = wildcardEscapingEnabled;
+            return this;
+        }
+        
         public TableConfiguration build() {
             return configuration;
         }

@@ -25,45 +25,44 @@ import java.util.ResourceBundle;
 public class Messages {
     private static final String BUNDLE_NAME = "org.mybatis.generator2.util.messages"; //$NON-NLS-1$
 
-    private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle
-            .getBundle(BUNDLE_NAME);
+    private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
+
+    public enum MessageId {
+        TRACING_1("Tracing.1"), //$NON-NLS-1$
+        TRACING_2("Tracing.2"), //$NON-NLS-1$
+        TRACING_5("Tracing.5"), //$NON-NLS-1$
+        TRACING_6("Tracing.6"), //$NON-NLS-1$
+        RUNTIME_ERROR_6("RuntimeError.6"), //$NON-NLS-1$
+        RUNTIME_ERROR_21("RuntimeError.21"), //$NON-NLS-1$
+        WARNING_29("Warning.29"); //$NON-NLS-1$
+
+        private String value;
+
+        private MessageId(String value) {
+            this.value = value;
+        }
+    }
 
     private Messages() {
     }
 
-    public static String getString(String key) {
+    public static String getString(MessageId key) {
         try {
-            return RESOURCE_BUNDLE.getString(key);
+            return RESOURCE_BUNDLE.getString(key.value);
         } catch (MissingResourceException e) {
-            return '!' + key + '!';
+            return '!' + key.value + '!';
         }
     }
 
-    public static String getString(String key, Object parm1) {
-        try {
-            return MessageFormat.format(RESOURCE_BUNDLE.getString(key),
-                    new Object[] { parm1 });
-        } catch (MissingResourceException e) {
-            return '!' + key + '!';
-        }
+    public static String getString(MessageId key, Object parm1) {
+        return MessageFormat.format(getString(key), new Object[] { parm1 });
     }
 
-    public static String getString(String key, Object parm1, Object parm2) {
-        try {
-            return MessageFormat.format(RESOURCE_BUNDLE.getString(key),
-                    new Object[] { parm1, parm2 });
-        } catch (MissingResourceException e) {
-            return '!' + key + '!';
-        }
+    public static String getString(MessageId key, Object parm1, Object parm2) {
+        return MessageFormat.format(getString(key), new Object[] { parm1, parm2 });
     }
 
-    public static String getString(String key, Object parm1, Object parm2,
-            Object parm3) {
-        try {
-            return MessageFormat.format(RESOURCE_BUNDLE.getString(key),
-                    new Object[] { parm1, parm2, parm3 });
-        } catch (MissingResourceException e) {
-            return '!' + key + '!';
-        }
+    public static String getString(MessageId key, Object parm1, Object parm2, Object parm3) {
+        return MessageFormat.format(getString(key), new Object[] { parm1, parm2, parm3 });
     }
 }

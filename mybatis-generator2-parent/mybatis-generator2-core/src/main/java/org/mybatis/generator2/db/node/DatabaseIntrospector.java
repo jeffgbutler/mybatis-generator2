@@ -1,20 +1,21 @@
 package org.mybatis.generator2.db.node;
 
 import static org.mybatis.generator2.util.Messages.getString;
-import static org.mybatis.generator2.util.StringUtils.composeFullyQualifiedTableName;
 import static org.mybatis.generator2.util.StringUtils.stringContainsSpace;
 
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 
 import org.mybatis.generator2.config.Context;
 import org.mybatis.generator2.config.TableConfiguration;
 import org.mybatis.generator2.log.Log;
 import org.mybatis.generator2.log.LogFactory;
-import org.mybatis.generator2.util.JDBCUtils;
+import org.mybatis.generator2.util.Messages.MessageId;
 
 public class DatabaseIntrospector {
 
@@ -26,61 +27,42 @@ public class DatabaseIntrospector {
     private DatabaseIntrospector() {
     }
 
-    public void introspectTables() {
-        context.getTables().forEach(t -> introspectTable(t));
+    public void introspectTables() throws SQLException {
+        List<TableConfiguration> tcs = context.getTables().collect(Collectors.toList());
+
+        for (TableConfiguration tc : tcs) {
+            introspectTable(tc);
+        }
     }
 
     public IntrospectionContext getIntrospectionContext() {
         return introspectionContext;
     }
 
-    private void introspectTable(TableConfiguration tc) {
+    private void introspectTable(TableConfiguration tc) throws SQLException {
         String catalog;
         String schemaPattern;
         String tableNamePattern;
-        try {
-            DatabaseCapabilities capabilities = getDatabaseCapabilities(databaseMetaData);
+        DatabaseCapabilities capabilities = DatabaseCapabilities.from(databaseMetaData);
 
-            catalog = conformNameToDatabase(tc.getCatalog(), tc.isDelimitIdentifiers(), capabilities);
-            schemaPattern = conformNameToDatabase(tc.getSchemaPattern(), tc.isDelimitIdentifiers(), capabilities);
-            tableNamePattern = conformNameToDatabase(tc.getTableNamePattern(), tc.isDelimitIdentifiers(), capabilities);
+        catalog = conformNameToDatabase(tc.getCatalog(), tc.isDelimitIdentifiers(), capabilities);
+        schemaPattern = conformNameToDatabase(tc.getSchemaPattern(), tc.isDelimitIdentifiers(), capabilities);
+        tableNamePattern = conformNameToDatabase(tc.getTableNamePattern(), tc.isDelimitIdentifiers(), capabilities);
 
-            if (tc.isWildcardEscapingEnabled()) {
-                schemaPattern = escapeWildcards(schemaPattern, capabilities);
-                tableNamePattern = escapeWildcards(tableNamePattern, capabilities);
-            }
-
-            if (logger.isTraceEnabled()) {
-                String fullTableName = composeFullyQualifiedTableName(catalog, schemaPattern, tableNamePattern, '.');
-                logger.trace(getString("Tracing.1", fullTableName)); //$NON-NLS-1$
-            }
-
-            getColumns(catalog, schemaPattern, tableNamePattern);
-            calculatePrimaryKeys();
-        } catch (SQLException e) {
-            logger.error("SQLException introspecting tables", e);
-        }
-    }
-
-    private String conformNameToDatabase(String name, boolean forceDelimit, DatabaseCapabilities capabilities) {
-        String answer;
-
-        if (forceDelimit) {
-            // user has requested that the names are delimited, so for this API
-            // call we
-            // use exactly what they entered
-            answer = name;
-        } else if (stringContainsSpace(name)) {
-            answer = name;
-        } else if (capabilities.storesLowerCaseIdentifiers) {
-            answer = name == null ? null : name.toLowerCase();
-        } else if (capabilities.storesUpperCaseIdentifiers) {
-            answer = name == null ? null : name.toUpperCase();
-        } else {
-            answer = name;
+        if (tc.isWildcardEscapingEnabled()) {
+            schemaPattern = escapeWildcards(schemaPattern, capabilities);
+            tableNamePattern = escapeWildcards(tableNamePattern, capabilities);
         }
 
-        return answer;
+        if (logger.isTraceEnabled()) {
+            logger.trace(getString(MessageId.TRACING_6, catalog, schemaPattern, tableNamePattern));
+        }
+
+        List<FullTableName> tables = getTables(catalog, schemaPattern, tableNamePattern);
+        for (FullTableName table : tables) {
+            IntrospectedTable introspectedTable = IntrospectedTable.from(table, databaseMetaData);
+            introspectionContext.addTable(introspectedTable);
+        }
     }
 
     /**
@@ -102,7 +84,7 @@ public class DatabaseIntrospector {
             String token = st.nextToken();
             if (token.equals("_") //$NON-NLS-1$
                     || token.equals("%")) { //$NON-NLS-1$
-                sb.append(capabilities.searchStringEscape);
+                sb.append(capabilities.getSearchStringEscape());
             }
             sb.append(token);
         }
@@ -110,112 +92,65 @@ public class DatabaseIntrospector {
         return pattern;
     }
 
-    private void getColumns(String catalog, String schemaPattern, String tableNamePattern) throws SQLException {
-        ResultSet rs = null;
+    private String conformNameToDatabase(String name, boolean forceDelimit, DatabaseCapabilities capabilities) {
+        String answer;
 
-        try {
-            rs = databaseMetaData.getColumns(catalog, schemaPattern, tableNamePattern, "%"); //$NON-NLS-1$
-            getColumns(rs);
-        } finally {
-            JDBCUtils.close(rs);
+        if (forceDelimit) {
+            // user has requested that the names are delimited, so for this API
+            // call we
+            // use exactly what they entered
+            answer = name;
+        } else if (stringContainsSpace(name)) {
+            answer = name;
+        } else if (capabilities.storesLowerCaseIdentifiers()) {
+            answer = name == null ? null : name.toLowerCase();
+        } else if (capabilities.storesUpperCaseIdentifiers()) {
+            answer = name == null ? null : name.toUpperCase();
+        } else {
+            answer = name;
         }
+
+        return answer;
     }
 
-    private void getColumns(ResultSet rs) throws SQLException {
-        ResultSetCapabilities capabilities = getResultSetCapabilities(rs.getMetaData());
+    private List<FullTableName> getTables(String catalog, String schemaPattern, String tableNamePattern)
+            throws SQLException {
+        List<FullTableName> tables = null;
+        try (ResultSet rs = databaseMetaData.getTables(catalog, schemaPattern, tableNamePattern, null)) {
+            tables = handleResultSet(rs);
+        }
 
+        return tables;
+    }
+
+    private List<FullTableName> handleResultSet(ResultSet rs) throws SQLException {
+        List<FullTableName> tables = new ArrayList<>();
         while (rs.next()) {
-            IntrospectedColumn introspectedColumn = new IntrospectedColumn();
-
-            introspectedColumn.dataType = rs.getInt("DATA_TYPE"); //$NON-NLS-1$
-            introspectedColumn.columnSize = rs.getInt("COLUMN_SIZE"); //$NON-NLS-1$
-            introspectedColumn.columnName = rs.getString("COLUMN_NAME"); //$NON-NLS-1$
-            introspectedColumn.nullable = rs.getInt("NULLABLE") == DatabaseMetaData.columnNullable; //$NON-NLS-1$
-            introspectedColumn.decimalDigits = rs.getInt("DECIMAL_DIGITS"); //$NON-NLS-1$
-            introspectedColumn.remarks = rs.getString("REMARKS"); //$NON-NLS-1$
-            introspectedColumn.columnDefault = rs.getString("COLUMN_DEF"); //$NON-NLS-1$
-            introspectedColumn.ordinalPosition = rs.getInt("ORDINAL_POSITION"); //$NON-NLS-1$
-            introspectedColumn.typeName = rs.getString("TYPE_NAME"); //$NON-NLS-1$
-
-            if (capabilities.supportsIsAutoIncrement) {
-                introspectedColumn.isAutoIncrement = "YES".equals(rs.getString("IS_AUTOINCREMENT")); //$NON-NLS-1$ //$NON-NLS-2$
-            }
-
-            if (capabilities.supportsIsGeneratedColumn) {
-                introspectedColumn.isGeneratedColumn = "YES".equals(rs.getString("IS_GENERATEDCOLUMN")); //$NON-NLS-1$ //$NON-NLS-2$
-            }
-
-            IntrospectedTable introspectedTable = introspectionContext.getIntrospectedTable(rs.getString("TABLE_CAT"), //$NON-NLS-1$
-                    rs.getString("TABLE_SCHEM"), //$NON-NLS-1$
-                    rs.getString("TABLE_NAME")); //$NON-NLS-1$
-
-            introspectedTable.addColumn(introspectedColumn);
-
-            if (logger.isTraceEnabled()) {
-                logger.trace(getString("Tracing.2", //$NON-NLS-1$
-                        introspectedColumn.columnName, introspectedColumn.dataType,
-                        introspectedTable.getFullTableName()));
-            }
+            tables.add(handleRow(tables, rs));
         }
+        
+        return tables;
     }
 
-    private DatabaseCapabilities getDatabaseCapabilities(DatabaseMetaData metaData) throws SQLException {
-        DatabaseCapabilities capabilities = new DatabaseCapabilities();
+    private FullTableName handleRow(List<FullTableName> tables, ResultSet rs) throws SQLException {
+        String catalog = rs.getString("TABLE_CAT"); //$NON-NLS-1$
+        String schema = rs.getString("TABLE_SCHEM"); //$NON-NLS-1$
+        String tableName = rs.getString("TABLE_NAME"); //$NON-NLS-1$
+        String remarks = rs.getString("REMARKS"); //$NON-NLS-1$
 
-        capabilities.storesLowerCaseIdentifiers = metaData.storesLowerCaseIdentifiers();
-        capabilities.storesUpperCaseIdentifiers = metaData.storesUpperCaseIdentifiers();
-        capabilities.searchStringEscape = metaData.getSearchStringEscape();
+        FullTableName fullTableName = FullTableName.from(catalog, schema, tableName, remarks);
 
-        return capabilities;
-    }
-
-    private ResultSetCapabilities getResultSetCapabilities(ResultSetMetaData metaData) throws SQLException {
-        ResultSetCapabilities capabilities = new ResultSetCapabilities();
-
-        int colCount = metaData.getColumnCount();
-        for (int i = 1; i <= colCount; i++) {
-            if ("IS_AUTOINCREMENT".equals(metaData.getColumnName(i))) { //$NON-NLS-1$
-                capabilities.supportsIsAutoIncrement = true;
-            }
-            if ("IS_GENERATEDCOLUMN".equals(metaData.getColumnName(i))) { //$NON-NLS-1$
-                capabilities.supportsIsGeneratedColumn = true;
-            }
+        if (logger.isTraceEnabled()) {
+            logger.trace(getString(MessageId.TRACING_5, fullTableName)); //$NON-NLS-1$
         }
-
-        return capabilities;
+        
+        return fullTableName;
     }
 
-    private void calculatePrimaryKeys() {
-        PrimaryKeyCalculator c = new PrimaryKeyCalculator(databaseMetaData);
-        introspectionContext.getTables().forEach(t -> c.calculatePrimaryKey(t));
-    }
-
-    public static class Builder {
-        private DatabaseIntrospector introspector = new DatabaseIntrospector();
-
-        public Builder withContext(Context context) {
-            introspector.context = context;
-            return this;
-        }
-
-        public Builder withDatabaseMetaData(DatabaseMetaData databaseMetaData) {
-            introspector.databaseMetaData = databaseMetaData;
-            return this;
-        }
-
-        public DatabaseIntrospector build() {
-            return introspector;
-        }
-    }
-
-    static class DatabaseCapabilities {
-        String searchStringEscape;
-        boolean storesUpperCaseIdentifiers;
-        boolean storesLowerCaseIdentifiers;
-    }
-
-    static class ResultSetCapabilities {
-        boolean supportsIsAutoIncrement;
-        boolean supportsIsGeneratedColumn;
+    public static DatabaseIntrospector from(Context context, DatabaseMetaData databaseMetaData) {
+        DatabaseIntrospector databaseIntrospector = new DatabaseIntrospector();
+        databaseIntrospector.context = context;
+        databaseIntrospector.databaseMetaData = databaseMetaData;
+        return databaseIntrospector;
     }
 }
