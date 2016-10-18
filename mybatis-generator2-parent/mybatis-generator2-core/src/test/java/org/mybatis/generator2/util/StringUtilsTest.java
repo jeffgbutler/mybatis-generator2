@@ -4,55 +4,55 @@ import static org.junit.Assert.assertThat;
 import static org.hamcrest.core.Is.*;
 import org.junit.Test;
 
-public class StringUtilsTest {
+public class StringUtilsTest implements StringUtils {
 
     @Test
     public void testSpaces() {
-        assertThat(StringUtils.stringContainsSpace("bamm bamm"), is(true));
+        assertThat(stringContainsSpace("bamm bamm"), is(true));
     }
 
     @Test
     public void testNoSpaces() {
-        assertThat(StringUtils.stringContainsSpace("Fred"), is(false));
+        assertThat(stringContainsSpace("Fred"), is(false));
     }
 
     @Test
     public void testNull() {
-        assertThat(StringUtils.stringContainsSpace(null), is(false));
+        assertThat(stringContainsSpace(null), is(false));
     }
     
     @Test
     public void testStringHasValue() {
-        assertThat(StringUtils.stringHasValue("Fred"), is(true));
+        assertThat(stringHasValue("Fred"), is(true));
     }
     
     @Test
     public void testStringHasValueWithSpaces() {
-        assertThat(StringUtils.stringHasValue("   "), is(false));
+        assertThat(stringHasValue("   "), is(false));
     }
     
     @Test
     public void testStringHasValueWithNull() {
-        assertThat(StringUtils.stringHasValue(null), is(false));
+        assertThat(stringHasValue(null), is(false));
     }
     
     @Test
-    public void testStrangHasWildCard1() {
-        assertThat(StringUtils.stringContainsSQLWildcard("fred%"), is(true));
+    public void testStringHasWildCard1() {
+        assertThat(stringContainsSQLWildcard("fred%"), is(true));
     }
     
     @Test
-    public void testStrangHasWildCard2() {
-        assertThat(StringUtils.stringContainsSQLWildcard("_fred"), is(true));
+    public void testStringHasWildCard2() {
+        assertThat(stringContainsSQLWildcard("_fred"), is(true));
     }
     
     @Test
-    public void testStrangHasWildCardWithNull() {
-        assertThat(StringUtils.stringContainsSQLWildcard(null), is(false));
+    public void testStringHasWildCardWithNull() {
+        assertThat(stringContainsSQLWildcard(null), is(false));
     }
     
     @Test
-    public void testStrangHasWildCardWithNoWildcardString() {
-        assertThat(StringUtils.stringContainsSQLWildcard("Fred"), is(false));
+    public void testStringHasWildCardWithNoWildcardString() {
+        assertThat(stringContainsSQLWildcard("Fred"), is(false));
     }
 }

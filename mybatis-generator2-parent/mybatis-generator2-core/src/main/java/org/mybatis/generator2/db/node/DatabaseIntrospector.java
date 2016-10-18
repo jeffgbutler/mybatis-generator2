@@ -1,7 +1,6 @@
 package org.mybatis.generator2.db.node;
 
 import static org.mybatis.generator2.util.Messages.getString;
-import static org.mybatis.generator2.util.StringUtils.stringContainsSpace;
 
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -15,9 +14,10 @@ import org.mybatis.generator2.config.Context;
 import org.mybatis.generator2.config.TableConfiguration;
 import org.mybatis.generator2.log.Log;
 import org.mybatis.generator2.log.LogFactory;
+import org.mybatis.generator2.util.StringUtils;
 import org.mybatis.generator2.util.Messages.MessageId;
 
-public class DatabaseIntrospector {
+public class DatabaseIntrospector implements StringUtils {
 
     private static Log logger = LogFactory.getLog(DatabaseIntrospector.class);
     private Context context;

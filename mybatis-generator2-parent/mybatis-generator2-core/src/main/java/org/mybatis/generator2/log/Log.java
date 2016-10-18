@@ -17,6 +17,14 @@ package org.mybatis.generator2.log;
 
 import java.util.function.Supplier;
 
+/**
+ * All methods take a Supplier<String> to enable deferred message generation.
+ * This allows us to remove the isXXXEnabled methods from the rest of the code 
+ * and implement them in just one place.
+ * 
+ * @author Jeff Butler
+ *
+ */
 public interface Log {
 
     void error(Supplier<String> s, Throwable e);
