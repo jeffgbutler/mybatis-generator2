@@ -1,10 +1,14 @@
 package org.mybatis.generator2.util;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.hamcrest.core.Is.*;
+import static org.mybatis.generator2.util.StringUtils.stringContainsSQLWildcard;
+import static org.mybatis.generator2.util.StringUtils.stringContainsSpace;
+import static org.mybatis.generator2.util.StringUtils.stringHasValue;
+
 import org.junit.Test;
 
-public class StringUtilsTest implements StringUtils {
+public class StringUtilsTest {
 
     @Test
     public void testSpaces() {

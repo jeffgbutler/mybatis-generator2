@@ -32,6 +32,8 @@ drop table GeneratedAlwaysTest if exists;
 drop table GeneratedAlwaysTestNoUpdates if exists;
 drop table IgnoreManyColumns if exists;
 drop sequence TestSequence if exists;
+drop table "table with wildcard%" if exists;
+drop table "table with wildcard2" if exists;
 
 create sequence TestSequence as integer start with 1;
 
@@ -188,4 +190,17 @@ create table IgnoreManyColumns (
   col14 int null,
   col15 int null,
   primary key(col01)
+);
+
+create table "table with wildcard%" (
+  id int not null,
+  name varchar(20),
+  primary key(id)
+);
+
+-- this table will match the table above if the name isn't escaped
+create table "table with wildcard2" (
+  id int not null,
+  name varchar(20),
+  primary key(id)
 );

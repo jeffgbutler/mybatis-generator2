@@ -37,6 +37,10 @@ public class LogFactory {
         tryJdk();
     }
     
+    private LogFactory() {
+        // utility class - no instances
+    }
+    
     private static void trySlf4j() {
         tryCandidate(Slf4jLoggingLogFactory.class);
     }

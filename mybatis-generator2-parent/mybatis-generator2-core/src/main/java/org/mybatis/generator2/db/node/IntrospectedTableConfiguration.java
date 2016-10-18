@@ -1,54 +1,53 @@
 package org.mybatis.generator2.db.node;
 
 import static org.mybatis.generator2.util.Messages.getString;
+import static org.mybatis.generator2.util.StringUtils.stringContainsSpace;
 
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import org.mybatis.generator2.config.Context;
 import org.mybatis.generator2.config.TableConfiguration;
 import org.mybatis.generator2.log.Log;
 import org.mybatis.generator2.log.LogFactory;
-import org.mybatis.generator2.util.StringUtils;
 import org.mybatis.generator2.util.Messages.MessageId;
 
-public class DatabaseIntrospector implements StringUtils {
+public class IntrospectedTableConfiguration {
+    private static Log logger = LogFactory.getLog(IntrospectedTableConfiguration.class);
+    
+    private TableConfiguration tableConfiguration;
+    private Map<FullTableName, IntrospectedTable> tables = new HashMap<>();
 
-    private static Log logger = LogFactory.getLog(DatabaseIntrospector.class);
-    private Context context;
-    private DatabaseMetaData databaseMetaData;
-    private IntrospectionContext introspectionContext = new IntrospectionContext();
-
-    private DatabaseIntrospector() {
+    private IntrospectedTableConfiguration() {
+    }
+    
+    public Stream<IntrospectedTable> getTables() {
+        return tables.values().stream();
     }
 
-    public void introspectTables() throws SQLException {
-        List<TableConfiguration> tcs = context.getTables().collect(Collectors.toList());
-
-        for (TableConfiguration tc : tcs) {
-            introspectTable(tc);
-        }
+    public static IntrospectedTableConfiguration from(TableConfiguration tableConfiguration, DatabaseMetaData databaseMetaData) throws SQLException {
+        IntrospectedTableConfiguration introspectedTableConfiguration = new IntrospectedTableConfiguration();
+        introspectedTableConfiguration.tableConfiguration = tableConfiguration;
+        introspectTable(introspectedTableConfiguration, databaseMetaData);
+        return introspectedTableConfiguration;
     }
 
-    public IntrospectionContext getIntrospectionContext() {
-        return introspectionContext;
-    }
-
-    private void introspectTable(TableConfiguration tc) throws SQLException {
+    private static void introspectTable(IntrospectedTableConfiguration configuration, DatabaseMetaData databaseMetaData) throws SQLException {
         DatabaseCapabilities capabilities = DatabaseCapabilities.from(databaseMetaData);
 
-        String catalog = conformNameToDatabase(tc.getCatalog(), tc.isDelimitIdentifiers(), capabilities);
-        String schemaPattern = conformNameToDatabase(tc.getSchemaPattern(), tc.isDelimitIdentifiers(), capabilities);
-        String tableNamePattern = conformNameToDatabase(tc.getTableNamePattern(), tc.isDelimitIdentifiers(), capabilities);
+        String catalog = conformNameToDatabase(configuration.tableConfiguration.getCatalog(), configuration.tableConfiguration.isDelimitIdentifiers(), capabilities);
+        String schemaPattern = conformNameToDatabase(configuration.tableConfiguration.getSchemaPattern(), configuration.tableConfiguration.isDelimitIdentifiers(), capabilities);
+        String tableNamePattern = conformNameToDatabase(configuration.tableConfiguration.getTableNamePattern(), configuration.tableConfiguration.isDelimitIdentifiers(), capabilities);
 
         String escapedSchemaPattern;
         String escapedTableNamePattern;
-        if (tc.isWildcardEscapingEnabled()) {
+        if (configuration.tableConfiguration.isWildcardEscapingEnabled()) {
             escapedSchemaPattern = escapeWildcards(schemaPattern, capabilities);
             escapedTableNamePattern = escapeWildcards(tableNamePattern, capabilities);
         } else {
@@ -58,10 +57,10 @@ public class DatabaseIntrospector implements StringUtils {
 
         logger.trace(() -> getString(MessageId.TRACING_6, catalog, escapedSchemaPattern, escapedTableNamePattern));
 
-        List<FullTableName> tables = getTables(catalog, escapedSchemaPattern, escapedTableNamePattern);
+        List<FullTableName> tables = getTables(catalog, escapedSchemaPattern, escapedTableNamePattern, databaseMetaData);
         for (FullTableName table : tables) {
             IntrospectedTable introspectedTable = IntrospectedTable.from(table, databaseMetaData);
-            introspectionContext.addTable(introspectedTable);
+            configuration.tables.put(introspectedTable.getFullTableName(), introspectedTable);
         }
     }
 
@@ -72,7 +71,7 @@ public class DatabaseIntrospector implements StringUtils {
      * @param capabilities
      * @return
      */
-    private String escapeWildcards(String pattern, DatabaseCapabilities capabilities) {
+    private static String escapeWildcards(String pattern, DatabaseCapabilities capabilities) {
         if (pattern == null) {
             return null;
         }
@@ -91,7 +90,7 @@ public class DatabaseIntrospector implements StringUtils {
         return sb.toString();
     }
 
-    private String conformNameToDatabase(String name, boolean forceDelimit, DatabaseCapabilities capabilities) {
+    private static String conformNameToDatabase(String name, boolean forceDelimit, DatabaseCapabilities capabilities) {
         String answer;
 
         if (forceDelimit) {
@@ -112,7 +111,7 @@ public class DatabaseIntrospector implements StringUtils {
         return answer;
     }
 
-    private List<FullTableName> getTables(String catalog, String schemaPattern, String tableNamePattern)
+    private static List<FullTableName> getTables(String catalog, String schemaPattern, String tableNamePattern, DatabaseMetaData databaseMetaData)
             throws SQLException {
         List<FullTableName> tables = null;
         try (ResultSet rs = databaseMetaData.getTables(catalog, schemaPattern, tableNamePattern, null)) {
@@ -122,7 +121,7 @@ public class DatabaseIntrospector implements StringUtils {
         return tables;
     }
 
-    private List<FullTableName> handleResultSet(ResultSet rs) throws SQLException {
+    private static List<FullTableName> handleResultSet(ResultSet rs) throws SQLException {
         List<FullTableName> tables = new ArrayList<>();
         while (rs.next()) {
             tables.add(handleRow(rs));
@@ -131,7 +130,7 @@ public class DatabaseIntrospector implements StringUtils {
         return tables;
     }
 
-    private FullTableName handleRow(ResultSet rs) throws SQLException {
+    private static FullTableName handleRow(ResultSet rs) throws SQLException {
         String catalog = rs.getString("TABLE_CAT"); //$NON-NLS-1$
         String schema = rs.getString("TABLE_SCHEM"); //$NON-NLS-1$
         String tableName = rs.getString("TABLE_NAME"); //$NON-NLS-1$
@@ -142,12 +141,5 @@ public class DatabaseIntrospector implements StringUtils {
         logger.trace(() -> getString(MessageId.TRACING_5, fullTableName)); //$NON-NLS-1$
         
         return fullTableName;
-    }
-
-    public static DatabaseIntrospector from(Context context, DatabaseMetaData databaseMetaData) {
-        DatabaseIntrospector databaseIntrospector = new DatabaseIntrospector();
-        databaseIntrospector.context = context;
-        databaseIntrospector.databaseMetaData = databaseMetaData;
-        return databaseIntrospector;
     }
 }

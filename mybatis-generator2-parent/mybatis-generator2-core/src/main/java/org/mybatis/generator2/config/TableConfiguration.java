@@ -31,6 +31,12 @@ public class TableConfiguration {
         return wildcardEscapingEnabled;
     }
     
+    public static TableConfiguration from(String tableNamePattern) {
+        TableConfiguration configuration = new TableConfiguration();
+        configuration.tableNamePattern = tableNamePattern;
+        return configuration;
+    }
+    
     public static class Builder {
         private TableConfiguration configuration = new TableConfiguration();
         

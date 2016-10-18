@@ -1,0 +1,5 @@
+1. Introspect
+2. Filter tables and columns per configuration
+3. Map introspection artifacts to generation artifacts
+4. Generate code from generation artifacts
+5. Render code

@@ -6,10 +6,14 @@ import java.sql.SQLException;
 
 public class TestUtils {
 
-    private static final String USERID = "sa";
-    private static final String JDBC_URL = "jdbc:hsqldb:mem:aname";
-    private static final String JDBC_DRIVER = "org.hsqldb.jdbcDriver";
+    public static final String USERID = "sa";
+    public static final String JDBC_URL = "jdbc:hsqldb:mem:aname";
+    public static final String JDBC_DRIVER = "org.hsqldb.jdbcDriver";
 
+    private TestUtils() {
+        // utility class - no instances
+    }
+    
     public static void createTestDatabase() {
         SqlScriptRunner scriptRunner = new SqlScriptRunner.Builder()
                 .withSqlScript("classpath:org/mybatis/generator2/testutils/CreateDB.sql")

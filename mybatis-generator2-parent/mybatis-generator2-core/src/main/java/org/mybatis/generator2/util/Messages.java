@@ -16,7 +16,6 @@
 package org.mybatis.generator2.util;
 
 import java.text.MessageFormat;
-import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 /**
@@ -34,6 +33,8 @@ public class Messages {
         TRACING_6("Tracing.6"), //$NON-NLS-1$
         RUNTIME_ERROR_6("RuntimeError.6"), //$NON-NLS-1$
         RUNTIME_ERROR_21("RuntimeError.21"), //$NON-NLS-1$
+        VALIDATION_ERROR_4("ValidationError.4"), //$NON-NLS-1$
+        VALIDATION_ERROR_5("ValidationError.5"), //$NON-NLS-1$
         WARNING_29("Warning.29"); //$NON-NLS-1$
 
         private String value;
@@ -47,11 +48,7 @@ public class Messages {
     }
 
     public static String getString(MessageId key) {
-        try {
-            return RESOURCE_BUNDLE.getString(key.value);
-        } catch (MissingResourceException e) {
-            return '!' + key.value + '!';
-        }
+        return RESOURCE_BUNDLE.getString(key.value);
     }
 
     public static String getString(MessageId key, Object parm1) {

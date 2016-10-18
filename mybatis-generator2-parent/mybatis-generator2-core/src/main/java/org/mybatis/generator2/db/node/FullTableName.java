@@ -1,8 +1,8 @@
 package org.mybatis.generator2.db.node;
 
-import org.mybatis.generator2.util.StringUtils;
+import static org.mybatis.generator2.util.StringUtils.stringHasValue;
 
-public class FullTableName implements StringUtils {
+public class FullTableName {
     private String tableName;
     private String catalog;
     private String schema;
