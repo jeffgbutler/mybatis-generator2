@@ -11,8 +11,8 @@ import org.junit.Test;
 import org.mybatis.generator2.config.Context;
 import org.mybatis.generator2.config.JDBCConnectionFactory;
 import org.mybatis.generator2.config.TableConfiguration;
-import org.mybatis.generator2.db.node.IntrospectedContext;
 import org.mybatis.generator2.exception.IntrospectionException;
+import org.mybatis.generator2.introspect.IntrospectedContext;
 import org.mybatis.generator2.testutils.TestUtils;
 
 public class IntrospectorIT {
@@ -78,7 +78,7 @@ public class IntrospectorIT {
         IntrospectedContext iContext = IntrospectedContext.from(context);
 
         assertThat(iContext.getConfigs().count(), is(17L));
-        iContext.getConfigs().forEach(c -> c.getTables().forEach(t -> {
+        iContext.getConfigs().forEach(c -> c.tables().forEach(t -> {
             long[] columnCounts = TABLE_INFO.get(t.getFullTableName().toString());
             
             if (columnCounts[0] > 0) {

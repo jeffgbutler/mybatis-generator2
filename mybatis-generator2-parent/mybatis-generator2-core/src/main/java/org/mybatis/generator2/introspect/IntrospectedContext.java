@@ -1,4 +1,4 @@
-package org.mybatis.generator2.db.node;
+package org.mybatis.generator2.introspect;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;

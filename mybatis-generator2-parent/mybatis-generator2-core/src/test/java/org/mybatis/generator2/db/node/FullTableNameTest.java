@@ -7,6 +7,7 @@ import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
+import org.mybatis.generator2.introspect.FullTableName;
 
 public class FullTableNameTest {
 
