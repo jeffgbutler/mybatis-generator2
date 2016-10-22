@@ -102,7 +102,7 @@ public class IntrospectedColumn {
         return isGeneratedColumn;
     }
 
-    public static IntrospectedColumn fromCurrentFow(ResultSet rs, ResultSetCapabilities capabilities) throws SQLException {
+    public static IntrospectedColumn fromCurrentRow(ResultSet rs, ResultSetCapabilities capabilities) throws SQLException {
         IntrospectedColumn introspectedColumn = new IntrospectedColumn();
 
         introspectedColumn.dataType = rs.getInt("DATA_TYPE"); //$NON-NLS-1$

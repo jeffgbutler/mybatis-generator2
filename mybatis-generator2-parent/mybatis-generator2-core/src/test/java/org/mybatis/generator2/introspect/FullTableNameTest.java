@@ -1,4 +1,4 @@
-package org.mybatis.generator2.db.node;
+package org.mybatis.generator2.introspect;
 
 import static org.hamcrest.core.IsNot.*;
 import static org.hamcrest.core.Is.*;
@@ -13,7 +13,9 @@ public class FullTableNameTest {
 
     @Test
     public void testTableOnly() {
-        FullTableName fullTableName = FullTableName.from(null, null, "table1", null);
+        FullTableName fullTableName = new FullTableName.Builder()
+                .withTableName("table1")
+                .build();
         assertThat(fullTableName.toString(), is("table1"));
         assertThat(fullTableName.getCatalog(), is(nullValue()));
         assertThat(fullTableName.getSchema(), is(nullValue()));
@@ -23,7 +25,10 @@ public class FullTableNameTest {
 
     @Test
     public void testTableAndSchema() {
-        FullTableName fullTableName = FullTableName.from(null, "schema1", "table1", null);
+        FullTableName fullTableName = new FullTableName.Builder()
+                .withSchema("schema1")
+                .withTableName("table1")
+                .build();
         assertThat(fullTableName.toString(), is("schema1.table1"));
         assertThat(fullTableName.getCatalog(), is(nullValue()));
         assertThat(fullTableName.getSchema(), is("schema1"));
@@ -33,7 +38,10 @@ public class FullTableNameTest {
 
     @Test
     public void testTableAndCatalog() {
-        FullTableName fullTableName = FullTableName.from("catalog1", null, "table1", null);
+        FullTableName fullTableName = new FullTableName.Builder()
+                .withCatalog("catalog1")
+                .withTableName("table1")
+                .build();
         assertThat(fullTableName.toString(), is("catalog1..table1"));
         assertThat(fullTableName.getCatalog(), is("catalog1"));
         assertThat(fullTableName.getSchema(), is(nullValue()));
@@ -43,7 +51,12 @@ public class FullTableNameTest {
 
     @Test
     public void testAll() {
-        FullTableName fullTableName = FullTableName.from("catalog1", "schema1", "table1", "some remarks");
+        FullTableName fullTableName = new FullTableName.Builder()
+                .withCatalog("catalog1")
+                .withSchema("schema1")
+                .withTableName("table1")
+                .withRemarks("some remarks")
+                .build();
         assertThat(fullTableName.toString(), is("catalog1.schema1.table1"));
         assertThat(fullTableName.getCatalog(), is("catalog1"));
         assertThat(fullTableName.getSchema(), is("schema1"));
@@ -53,20 +66,32 @@ public class FullTableNameTest {
 
     @Test
     public void testEquals() {
-        FullTableName fullTableName1 = FullTableName.from(null, "schema1", "table1", null);
-        FullTableName fullTableName2 = FullTableName.from(null, "schema1", "table1", null);
+        FullTableName fullTableName1 = new FullTableName.Builder()
+                .withSchema("schema1")
+                .withTableName("table1")
+                .build();
+        FullTableName fullTableName2 = new FullTableName.Builder()
+                .withSchema("schema1")
+                .withTableName("table1")
+                .build();
         assertThat(fullTableName1, is(equalTo(fullTableName2)));
     }
 
     @Test
     public void testEqualsWithNull() {
-        FullTableName fullTableName1 = FullTableName.from(null, "schema1", "table1", null);
+        FullTableName fullTableName1 = new FullTableName.Builder()
+                .withSchema("schema1")
+                .withTableName("table1")
+                .build();
         assertThat(fullTableName1, is(not(equalTo(nullValue()))));
     }
 
     @Test
     public void testEqualsWithString() {
-        FullTableName fullTableName1 = FullTableName.from(null, "schema1", "table1", null);
+        FullTableName fullTableName1 = new FullTableName.Builder()
+                .withSchema("schema1")
+                .withTableName("table1")
+                .build();
         assertThat(fullTableName1, is(not(equalTo("fred"))));
     }
 }

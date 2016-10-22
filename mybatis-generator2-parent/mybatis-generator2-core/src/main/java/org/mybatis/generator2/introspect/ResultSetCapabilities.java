@@ -3,7 +3,7 @@ package org.mybatis.generator2.introspect;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
-class ResultSetCapabilities {
+public class ResultSetCapabilities {
     private boolean supportsIsAutoIncrement;
     private boolean supportsIsGeneratedColumn;
 

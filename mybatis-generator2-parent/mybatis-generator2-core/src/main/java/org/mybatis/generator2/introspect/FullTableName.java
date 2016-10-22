@@ -3,10 +3,13 @@ package org.mybatis.generator2.introspect;
 import static org.mybatis.generator2.util.StringUtils.stringHasValue;
 
 public class FullTableName {
-    private String tableName;
     private String catalog;
     private String schema;
+    private String tableName;
+    private String escapedSchema;
+    private String escapedTableName;
     private String remarks;
+    private boolean wasEscaped;
     private String fullyQualifiedTableName;
 
     private FullTableName() {
@@ -69,13 +72,55 @@ public class FullTableName {
         return remarks;
     }
 
-    public static FullTableName from(String catalog, String schema, String tableName, String remarks) {
-        FullTableName fullTableName = new FullTableName();
-        fullTableName.catalog = catalog;
-        fullTableName.schema = schema;
-        fullTableName.tableName = tableName;
-        fullTableName.remarks = remarks;
-        fullTableName.updateFullyQualifiedTableName();
-        return fullTableName;
+    public String getIntrospectionSchema() {
+        return wasEscaped ? escapedSchema : schema;
+    }
+
+    public String getIntrospectionTableName() {
+        return wasEscaped ? escapedTableName : tableName;
+    }
+
+    public static class Builder {
+        private FullTableName fullTableName = new FullTableName();
+        
+        public Builder withCatalog(String catalog) {
+            fullTableName.catalog = catalog;
+            return this;
+        }
+        
+        public Builder withSchema(String schema) {
+            fullTableName.schema = schema;
+            return this;
+        }
+        
+        public Builder withTableName(String tableName) {
+            fullTableName.tableName = tableName;
+            return this;
+        }
+        
+        public Builder withRemarks(String remarks) {
+            fullTableName.remarks = remarks;
+            return this;
+        }
+
+        public Builder wasEscaped(boolean wasEscaped) {
+            fullTableName.wasEscaped = wasEscaped;
+            return this;
+        }
+        
+        public Builder withEscapedSchema(String escapedSchema) {
+            fullTableName.escapedSchema = escapedSchema;
+            return this;
+        }
+        
+        public Builder withEscapedTableName(String escapedTableName) {
+            fullTableName.escapedTableName = escapedTableName;
+            return this;
+        }
+
+        public FullTableName build() {
+            fullTableName.updateFullyQualifiedTableName();
+            return fullTableName;
+        }
     }
 }

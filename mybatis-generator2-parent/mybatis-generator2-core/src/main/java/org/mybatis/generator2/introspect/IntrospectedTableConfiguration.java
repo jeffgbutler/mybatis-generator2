@@ -39,6 +39,8 @@ public class IntrospectedTableConfiguration {
         private IntrospectedTableConfiguration introspectedTableConfiguration = new IntrospectedTableConfiguration();
         private TableConfiguration tableConfiguration;
         private DatabaseMetaData databaseMetaData;
+        private String escapedSchemaPattern;
+        private String escapedTableNamePattern;
         
         public Builder(TableConfiguration tableConfiguration,
                 DatabaseMetaData databaseMetaData) {
@@ -63,8 +65,6 @@ public class IntrospectedTableConfiguration {
             String tableNamePattern = conformNameToDatabase(tableConfiguration.getTableNamePattern(),
                     tableConfiguration.isDelimitIdentifiers(), capabilities);
 
-            String escapedSchemaPattern;
-            String escapedTableNamePattern;
             if (tableConfiguration.isWildcardEscapingEnabled()) {
                 escapedSchemaPattern = escapeWildcards(schemaPattern, capabilities);
                 escapedTableNamePattern = escapeWildcards(tableNamePattern, capabilities);
@@ -78,9 +78,32 @@ public class IntrospectedTableConfiguration {
             List<FullTableName> tables = getTables(catalog, escapedSchemaPattern, escapedTableNamePattern,
                     databaseMetaData);
             for (FullTableName table : tables) {
-                IntrospectedTable introspectedTable = IntrospectedTable.from(table, databaseMetaData);
+                IntrospectedTable introspectedTable = IntrospectedTable.from(tableConfiguration, table, databaseMetaData);
                 introspectedTableConfiguration.tables.add(introspectedTable);
             }
+        }
+
+        private String conformNameToDatabase(String name, boolean forceDelimit,
+                DatabaseCapabilities capabilities) {
+            String answer;
+
+            if (forceDelimit) {
+                // user has requested that the names are delimited, so for this
+                // API
+                // call we
+                // use exactly what they entered
+                answer = name;
+            } else if (stringContainsSpace(name)) {
+                answer = name;
+            } else if (capabilities.storesLowerCaseIdentifiers()) {
+                answer = name == null ? null : name.toLowerCase();
+            } else if (capabilities.storesUpperCaseIdentifiers()) {
+                answer = name == null ? null : name.toUpperCase();
+            } else {
+                answer = name;
+            }
+
+            return answer;
         }
 
         /**
@@ -109,29 +132,6 @@ public class IntrospectedTableConfiguration {
             return sb.toString();
         }
 
-        private String conformNameToDatabase(String name, boolean forceDelimit,
-                DatabaseCapabilities capabilities) {
-            String answer;
-
-            if (forceDelimit) {
-                // user has requested that the names are delimited, so for this
-                // API
-                // call we
-                // use exactly what they entered
-                answer = name;
-            } else if (stringContainsSpace(name)) {
-                answer = name;
-            } else if (capabilities.storesLowerCaseIdentifiers()) {
-                answer = name == null ? null : name.toLowerCase();
-            } else if (capabilities.storesUpperCaseIdentifiers()) {
-                answer = name == null ? null : name.toUpperCase();
-            } else {
-                answer = name;
-            }
-
-            return answer;
-        }
-
         private List<FullTableName> getTables(String catalog, String schemaPattern, String tableNamePattern,
                 DatabaseMetaData databaseMetaData) throws SQLException {
             List<FullTableName> tables = null;
@@ -157,7 +157,15 @@ public class IntrospectedTableConfiguration {
             String tableName = rs.getString("TABLE_NAME"); //$NON-NLS-1$
             String remarks = rs.getString("REMARKS"); //$NON-NLS-1$
 
-            FullTableName fullTableName = FullTableName.from(catalog, schema, tableName, remarks);
+            FullTableName fullTableName = new FullTableName.Builder()
+                    .withCatalog(catalog)
+                    .withSchema(schema)
+                    .withTableName(tableName)
+                    .withRemarks(remarks)
+                    .wasEscaped(tableConfiguration.isWildcardEscapingEnabled())
+                    .withEscapedSchema(escapedSchemaPattern)
+                    .withEscapedTableName(escapedTableNamePattern)
+                    .build();
 
             logger.trace(() -> getString(MessageId.TRACING_5, fullTableName)); // $NON-NLS-1$
 

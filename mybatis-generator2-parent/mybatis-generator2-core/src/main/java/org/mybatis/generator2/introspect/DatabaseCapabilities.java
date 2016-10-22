@@ -3,7 +3,7 @@ package org.mybatis.generator2.introspect;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
-class DatabaseCapabilities {
+public class DatabaseCapabilities {
     private String searchStringEscape;
     private boolean storesUpperCaseIdentifiers;
     private boolean storesLowerCaseIdentifiers;
