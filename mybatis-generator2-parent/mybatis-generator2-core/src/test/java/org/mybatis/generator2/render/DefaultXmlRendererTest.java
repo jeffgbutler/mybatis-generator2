@@ -4,6 +4,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
+import org.mybatis.generator2.dom.xml.Attribute;
 import org.mybatis.generator2.dom.xml.Document;
 import org.mybatis.generator2.dom.xml.DocumentTest;
 import org.mybatis.generator2.dom.xml.XmlElement;
@@ -34,6 +35,7 @@ public class DefaultXmlRendererTest {
     @Test
     public void testEmptyDocument() {
         XmlElement rootElement = new XmlElement("root");
+        rootElement.addAttribute(new Attribute("foo", "bar"));
         Document document = new Document(null, null, rootElement);
         DefaultXmlRenderer renderer = new DefaultXmlRenderer();
         String content = renderer.render(document);
@@ -41,7 +43,7 @@ public class DefaultXmlRendererTest {
         String targetContent =
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + System.lineSeparator() +
             "<!DOCTYPE root>" + System.lineSeparator() +
-            "<root />";
+            "<root foo=\"bar\" />";
         
         assertThat(content, is(targetContent));
     }

@@ -32,7 +32,7 @@ public class DocumentTest {
             assertThat(a.getParent(), is(root));
         });
 
-        root.elements().forEach(a -> {
+        root.children().forEach(a -> {
             assertThat(a.getParent(), is(root));
         });
     }

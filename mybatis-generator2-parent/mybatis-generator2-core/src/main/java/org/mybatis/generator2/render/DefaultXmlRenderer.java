@@ -62,28 +62,45 @@ public class DefaultXmlRenderer implements XmlDomVisitor, OutputUtilities {
 
     @Override
     public boolean visit(XmlElement xmlElement) {
+
+        if (xmlElement.hasChildElements()) {
+            visitElementWithChildren(xmlElement);
+        } else {
+            visitElementWithoutChildren(xmlElement);
+        }
+
+        return false;
+    }
+
+    private void visitElementWithChildren(XmlElement xmlElement) {
         newLine(buffer);
         xmlIndent(buffer, indentLevel);
         buffer.append('<');
         buffer.append(xmlElement.getName());
-
         xmlElement.attributes().sorted().forEach(a -> a.accept(this));
+        buffer.append('>');
 
-        if (xmlElement.hasElements()) {
-            indentLevel++;
-            buffer.append(">"); //$NON-NLS-1$
-            xmlElement.elements().forEach(e -> e.accept(this));
-            
-            newLine(buffer);
-            indentLevel--;
-            xmlIndent(buffer, indentLevel);
-            buffer.append("</"); //$NON-NLS-1$
-            buffer.append(xmlElement.getName());
-            buffer.append('>');
-        } else {
-            buffer.append(" />"); //$NON-NLS-1$
-        }
+        visitChildren(xmlElement);
+        
+        newLine(buffer);
+        xmlIndent(buffer, indentLevel);
+        buffer.append("</"); //$NON-NLS-1$
+        buffer.append(xmlElement.getName());
+        buffer.append('>');
+    }
 
-        return false;
+    private void visitChildren(XmlElement xmlElement) {
+        indentLevel++;
+        xmlElement.children().forEach(e -> e.accept(this));
+        indentLevel--;
+    }
+
+    private void visitElementWithoutChildren(XmlElement xmlElement) {
+        newLine(buffer);
+        xmlIndent(buffer, indentLevel);
+        buffer.append('<');
+        buffer.append(xmlElement.getName());
+        xmlElement.attributes().sorted().forEach(a -> a.accept(this));
+        buffer.append(" />"); //$NON-NLS-1$
     }
 }

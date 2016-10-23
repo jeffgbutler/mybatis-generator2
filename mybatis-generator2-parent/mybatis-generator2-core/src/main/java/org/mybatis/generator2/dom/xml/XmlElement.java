@@ -42,7 +42,7 @@ public class XmlElement extends AbstractElement {
         attributes.add(attribute);
     }
 
-    public Stream<AbstractElement> elements() {
+    public Stream<AbstractElement> children() {
         return elements.stream();
     }
 
@@ -51,7 +51,7 @@ public class XmlElement extends AbstractElement {
         elements.add(element);
     }
 
-    public boolean hasElements() {
+    public boolean hasChildElements() {
         return !elements.isEmpty();
     }
 
