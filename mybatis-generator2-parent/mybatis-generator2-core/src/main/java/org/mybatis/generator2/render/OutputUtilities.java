@@ -31,7 +31,7 @@ public interface OutputUtilities {
      * @param indentLevel
      *            the required indent level
      */
-    static void javaIndent(StringBuilder buffer, int indentLevel) {
+    default void javaIndent(StringBuilder buffer, int indentLevel) {
         for (int i = 0; i < indentLevel; i++) {
             buffer.append("    "); //$NON-NLS-1$
         }
@@ -46,7 +46,7 @@ public interface OutputUtilities {
      * @param indentLevel
      *            the required indent level
      */
-    static void xmlIndent(StringBuilder buffer, int indentLevel) {
+    default void xmlIndent(StringBuilder buffer, int indentLevel) {
         for (int i = 0; i < indentLevel; i++) {
             buffer.append("  "); //$NON-NLS-1$
         }
@@ -58,7 +58,7 @@ public interface OutputUtilities {
      * @param buffer
      *            the StringBuilder to be appended to
      */
-    static void newLine(StringBuilder buffer) {
+    default void newLine(StringBuilder buffer) {
         buffer.append(System.lineSeparator());
     }
 }

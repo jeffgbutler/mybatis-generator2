@@ -1,15 +1,12 @@
 package org.mybatis.generator2.render;
 
-import static org.mybatis.generator2.render.OutputUtilities.newLine;
-import static org.mybatis.generator2.render.OutputUtilities.xmlIndent;
-
 import org.mybatis.generator2.dom.xml.Attribute;
 import org.mybatis.generator2.dom.xml.Document;
 import org.mybatis.generator2.dom.xml.TextElement;
 import org.mybatis.generator2.dom.xml.XmlDomVisitor;
 import org.mybatis.generator2.dom.xml.XmlElement;
 
-public class DefaultXmlRenderer implements XmlDomVisitor {
+public class DefaultXmlRenderer implements XmlDomVisitor, OutputUtilities {
     
     private StringBuilder buffer = new StringBuilder();
     private int indentLevel = 0;
