@@ -30,11 +30,11 @@ public class IntrospectedTable {
         return fullTableName;
     }
 
-    public Stream<IntrospectedColumn> getAllColumns() {
+    public Stream<IntrospectedColumn> allColumns() {
         return columns.stream();
     }
 
-    public Stream<IntrospectedColumn> getPrimaryKeyColumns() {
+    public Stream<IntrospectedColumn> primaryKeyColumns() {
         return columns.stream().filter(IntrospectedColumn::isPrimaryKeyColumn);
     }
 
@@ -42,7 +42,7 @@ public class IntrospectedTable {
         return columns.stream().anyMatch(IntrospectedColumn::isPrimaryKeyColumn);
     }
 
-    public Stream<IntrospectedColumn> getBlobColumns() {
+    public Stream<IntrospectedColumn> blobColumns() {
         return columns.stream().filter(IntrospectedColumn::isBlobColumn);
     }
 
@@ -50,7 +50,7 @@ public class IntrospectedTable {
         return columns.stream().anyMatch(IntrospectedColumn::isBlobColumn);
     }
 
-    public Stream<IntrospectedColumn> getBaseColumns() {
+    public Stream<IntrospectedColumn> baseColumns() {
         return columns.stream().filter(IntrospectedColumn::isBaseColumn);
     }
 
