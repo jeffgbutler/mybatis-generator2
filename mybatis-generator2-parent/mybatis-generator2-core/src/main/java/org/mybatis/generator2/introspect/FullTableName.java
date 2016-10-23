@@ -46,28 +46,6 @@ public class FullTableName {
         return fullyQualifiedTableName;
     }
 
-    private void updateFullyQualifiedTableName() {
-        StringBuilder sb = new StringBuilder();
-
-        if (stringHasValue(catalog)) {
-            sb.append(catalog);
-            sb.append('.');
-        }
-
-        if (stringHasValue(schema)) {
-            sb.append(schema);
-            sb.append('.');
-        } else {
-            if (sb.length() > 0) {
-                sb.append('.');
-            }
-        }
-
-        sb.append(tableName);
-
-        fullyQualifiedTableName = sb.toString();
-    }
-    
     public String getRemarks() {
         return remarks;
     }
@@ -119,8 +97,30 @@ public class FullTableName {
         }
 
         public FullTableName build() {
-            fullTableName.updateFullyQualifiedTableName();
+            updateFullyQualifiedTableName();
             return fullTableName;
+        }
+
+        private void updateFullyQualifiedTableName() {
+            StringBuilder sb = new StringBuilder();
+
+            if (stringHasValue(fullTableName.catalog)) {
+                sb.append(fullTableName.catalog);
+                sb.append('.');
+            }
+
+            if (stringHasValue(fullTableName.schema)) {
+                sb.append(fullTableName.schema);
+                sb.append('.');
+            } else {
+                if (sb.length() > 0) {
+                    sb.append('.');
+                }
+            }
+
+            sb.append(fullTableName.tableName);
+
+            fullTableName.fullyQualifiedTableName = sb.toString();
         }
     }
 }

@@ -8,6 +8,7 @@ public class Configuration {
     private List<Context> contexts = new ArrayList<>();
 
     public Configuration() {
+        super();
     }
 
     public void addContext(Context context) {
