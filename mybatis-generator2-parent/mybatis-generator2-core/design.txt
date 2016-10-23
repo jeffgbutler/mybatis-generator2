@@ -1,9 +1,0 @@
-Default Workflow:
-
-  1. Introspect (map config objects to introspected objects)
-  2. Filter tables and columns per configuration (filter introspected objects)
-  3. Map introspection artifacts to generation artifacts (map introspected objects to generator objects)
-  4. Generate code from generation artifacts (map generator objects to DOM objects)
-  5. Render code (map DOM objects to Java/XML code)
-
-Ability to change the workflow
