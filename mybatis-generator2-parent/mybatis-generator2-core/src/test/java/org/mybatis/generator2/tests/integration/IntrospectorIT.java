@@ -83,30 +83,30 @@ public class IntrospectorIT {
             
             if (columnCounts[0] > 0) {
                 assertThat(t.hasPrimaryKey(), is(true));
-                assertThat(t.getPrimaryKeyColumns().count(), is(columnCounts[0]));
+                assertThat(t.primaryKeyColumns().count(), is(columnCounts[0]));
             } else {
                 assertThat(t.hasPrimaryKey(), is(false));
-                assertThat(t.getPrimaryKeyColumns().count(), is(0L));
+                assertThat(t.primaryKeyColumns().count(), is(0L));
             }
             
             if (columnCounts[1] > 0) {
                 assertThat(t.hasBaseColumns(), is(true));
-                assertThat(t.getBaseColumns().count(), is(columnCounts[1]));
+                assertThat(t.baseColumns().count(), is(columnCounts[1]));
             } else {
                 assertThat(t.hasBaseColumns(), is(false));
-                assertThat(t.getBaseColumns().count(), is(0L));
+                assertThat(t.baseColumns().count(), is(0L));
             }
             
             if (columnCounts[2] > 0) {
                 assertThat(t.hasBlobColumns(), is(true));
-                assertThat(t.getBlobColumns().count(), is(columnCounts[2]));
+                assertThat(t.blobColumns().count(), is(columnCounts[2]));
             } else {
                 assertThat(t.hasBlobColumns(), is(false));
-                assertThat(t.getBlobColumns().count(), is(0L));
+                assertThat(t.blobColumns().count(), is(0L));
             }
             
             assertThat(t.hasAnyColumns(), is(true));
-            assertThat(t.getAllColumns().count(), is(Arrays.stream(columnCounts).sum()));
+            assertThat(t.allColumns().count(), is(Arrays.stream(columnCounts).sum()));
         }));
     }
 }
