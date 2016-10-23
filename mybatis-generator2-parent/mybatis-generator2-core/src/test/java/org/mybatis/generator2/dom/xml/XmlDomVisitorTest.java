@@ -56,7 +56,7 @@ public class XmlDomVisitorTest {
     }
 
     @Test
-    public void testDefaultVisitorIsCalledCorrectly2() {
+    public void testVisitorIsNotStoppedByAttributesOrTextElements() {
         XmlDomVisitor visitor = spy(new XmlDomVisitor(){
             @Override
             public boolean visit(Attribute attribute) {
