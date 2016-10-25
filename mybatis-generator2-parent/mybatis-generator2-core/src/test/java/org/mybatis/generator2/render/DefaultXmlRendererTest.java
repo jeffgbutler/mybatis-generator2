@@ -8,14 +8,15 @@ import org.mybatis.generator2.dom.xml.Attribute;
 import org.mybatis.generator2.dom.xml.Document;
 import org.mybatis.generator2.dom.xml.DocumentTest;
 import org.mybatis.generator2.dom.xml.XmlElement;
+import org.mybatis.generator2.render.xml.DefaultXmlRenderer;
 
 public class DefaultXmlRendererTest {
 
     @Test
     public void testFullDocument() {
         Document document = DocumentTest.setupDocument();
-        DefaultXmlRenderer renderer = new DefaultXmlRenderer();
-        String content = renderer.render(document);
+        DefaultXmlRenderer renderer = DefaultXmlRenderer.of(document);
+        String content = renderer.render();
         
         String targetContent = 
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + System.lineSeparator() +
@@ -34,13 +35,11 @@ public class DefaultXmlRendererTest {
 
     @Test
     public void testEmptyDocument() {
-        XmlElement rootElement = new XmlElement.Builder()
-                .withName("root")
-                .withAttribute(Attribute.of("foo", "bar"))
-                .build();
+        XmlElement rootElement = XmlElement.of("root");
+        rootElement = rootElement.withAttribute(Attribute.of("foo", "bar"));
         Document document = Document.of(rootElement);
-        DefaultXmlRenderer renderer = new DefaultXmlRenderer();
-        String content = renderer.render(document);
+        DefaultXmlRenderer renderer = DefaultXmlRenderer.of(document);
+        String content = renderer.render();
         
         String targetContent =
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + System.lineSeparator() +

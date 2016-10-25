@@ -74,6 +74,12 @@ public class XmlElement extends AbstractElement {
         }
     }
 
+    public static XmlElement of(String name) {
+        return new Builder()
+                .withName(name)
+                .build();
+    }
+    
     public static class Builder {
         private XmlElement xmlElement = new XmlElement();
         
