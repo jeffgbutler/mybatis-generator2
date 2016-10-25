@@ -15,16 +15,13 @@
  */
 package org.mybatis.generator2.dom.xml;
 
-public class Attribute implements XmlDomNode, Comparable<Attribute>{
+public class Attribute extends XmlDomNode implements Comparable<Attribute>{
     
     private String name;
     private String value;
-    XmlElement parent;
 
-    public Attribute(String name, String value) {
+    private Attribute() {
         super();
-        this.name = name;
-        this.value = value;
     }
 
     public String getName() {
@@ -38,11 +35,6 @@ public class Attribute implements XmlDomNode, Comparable<Attribute>{
     @Override
     public void accept(XmlDomVisitor visitor) {
         visitor.visit(this);
-    }
-
-    @Override
-    public XmlElement getParent() {
-        return parent;
     }
 
     @Override
@@ -88,5 +80,12 @@ public class Attribute implements XmlDomNode, Comparable<Attribute>{
         } else {
             return s2 == null ? 1 : s1.compareTo(s2);
         }
+    }
+    
+    public static Attribute of(String name, String value) {
+        Attribute attribute = new Attribute();
+        attribute.name = name;
+        attribute.value = value;
+        return attribute;
     }
 }

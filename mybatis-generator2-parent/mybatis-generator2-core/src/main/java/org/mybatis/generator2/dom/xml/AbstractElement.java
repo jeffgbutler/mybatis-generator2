@@ -18,11 +18,5 @@ package org.mybatis.generator2.dom.xml;
 /**
  * @author Jeff Butler
  */
-public abstract class AbstractElement implements XmlDomNode {
-    XmlDomNode parent;
-    
-    @Override
-    public XmlDomNode getParent() {
-        return parent;
-    }
+public abstract class AbstractElement extends XmlDomNode {
 }

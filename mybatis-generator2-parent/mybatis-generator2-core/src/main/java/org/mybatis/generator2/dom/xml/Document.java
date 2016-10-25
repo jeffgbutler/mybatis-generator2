@@ -18,18 +18,14 @@ package org.mybatis.generator2.dom.xml;
 /**
  * @author Jeff Butler
  */
-public class Document implements XmlDomNode {
+public class Document extends XmlDomNode {
     
     private String publicId;
     private String systemId;
     private XmlElement rootElement;
 
-    public Document(String publicId, String systemId, XmlElement rootElement) {
+    private Document() {
         super();
-        this.publicId = publicId;
-        this.systemId = systemId;
-        rootElement.parent = this;
-        this.rootElement = rootElement;
     }
 
     public XmlElement getRootElement() {
@@ -51,8 +47,16 @@ public class Document implements XmlDomNode {
         }
     }
 
-    @Override
-    public XmlDomNode getParent() {
-        return null;
+    public static Document of(XmlElement rootElement) {
+        return of(null, null, rootElement);
+    }
+    
+    public static Document of(String publicId, String systemId, XmlElement rootElement) {
+        Document document = new Document();
+        document.publicId = publicId;
+        document.systemId = systemId;
+        document.rootElement = rootElement;
+        document.rootElement.parent = document;
+        return document;
     }
 }

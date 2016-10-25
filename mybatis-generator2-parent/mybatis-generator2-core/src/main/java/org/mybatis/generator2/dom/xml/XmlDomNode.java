@@ -1,7 +1,12 @@
 package org.mybatis.generator2.dom.xml;
 
-public interface XmlDomNode {
+public abstract class XmlDomNode {
 
-    XmlDomNode getParent();
-    void accept(XmlDomVisitor visitor);
+    XmlDomNode parent;
+    
+    public XmlDomNode getParent() {
+        return parent;
+    }
+    
+    public abstract void accept(XmlDomVisitor visitor);
 }

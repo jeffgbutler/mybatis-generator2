@@ -19,9 +19,8 @@ public class TextElement extends AbstractElement {
     
     private String content;
 
-    public TextElement(String content) {
+    private TextElement() {
         super();
-        this.content = content;
     }
 
     public String getContent() {
@@ -31,5 +30,11 @@ public class TextElement extends AbstractElement {
     @Override
     public void accept(XmlDomVisitor visitor) {
         visitor.visit(this);
+    }
+
+    public static TextElement of(String content) {
+        TextElement textElement = new TextElement();
+        textElement.content = content;
+        return textElement;
     }
 }

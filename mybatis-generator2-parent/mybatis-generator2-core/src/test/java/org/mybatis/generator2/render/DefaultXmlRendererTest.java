@@ -34,9 +34,11 @@ public class DefaultXmlRendererTest {
 
     @Test
     public void testEmptyDocument() {
-        XmlElement rootElement = new XmlElement("root");
-        rootElement.addAttribute(new Attribute("foo", "bar"));
-        Document document = new Document(null, null, rootElement);
+        XmlElement rootElement = new XmlElement.Builder()
+                .withName("root")
+                .withAttribute(Attribute.of("foo", "bar"))
+                .build();
+        Document document = Document.of(rootElement);
         DefaultXmlRenderer renderer = new DefaultXmlRenderer();
         String content = renderer.render(document);
         

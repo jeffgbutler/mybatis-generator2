@@ -9,7 +9,7 @@ public class TextElementTest {
 
     @Test
     public void testGetters() {
-        TextElement te = new TextElement("select * from foo");
+        TextElement te = TextElement.of("select * from foo");
         assertThat(te.getContent(), equalTo("select * from foo"));
     }
 

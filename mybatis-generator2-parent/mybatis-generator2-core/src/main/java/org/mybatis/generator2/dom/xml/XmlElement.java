@@ -25,45 +25,93 @@ import java.util.stream.Stream;
 public class XmlElement extends AbstractElement {
     
     private List<Attribute> attributes = new ArrayList<>();
-    private List<AbstractElement> elements = new ArrayList<>();
+    private List<AbstractElement> children = new ArrayList<>();
     private String name;
 
-    public XmlElement(String name) {
+    private XmlElement() {
         super();
-        this.name = name;
     }
     
     public Stream<Attribute> attributes() {
         return attributes.stream();
     }
 
-    public void addAttribute(Attribute attribute) {
-        attribute.parent = this;
-        attributes.add(attribute);
-    }
-
     public Stream<AbstractElement> children() {
-        return elements.stream();
+        return children.stream();
     }
 
-    public void addElement(AbstractElement element) {
-        element.parent = this;
-        elements.add(element);
-    }
-
-    public boolean hasChildElements() {
-        return !elements.isEmpty();
+    public boolean hasChildren() {
+        return !children.isEmpty();
     }
 
     public String getName() {
         return name;
     }
 
+    public XmlElement withAttribute(Attribute attribute) {
+        return new Builder()
+                .withAttributes(attributes())
+                .withAttribute(attribute)
+                .withChildren(children())
+                .withName(getName())
+                .build();
+    }
+    
+    public XmlElement withChild(AbstractElement child) {
+        return new Builder()
+                .withAttributes(attributes())
+                .withChildren(children())
+                .withChild(child)
+                .withName(getName())
+                .build();
+    }
+    
     @Override
     public void accept(XmlDomVisitor visitor) {
         if (visitor.visit(this)) {
             attributes.stream().forEach(a -> a.accept(visitor));
-            elements.stream().forEach(e -> e.accept(visitor));
+            children.stream().forEach(e -> e.accept(visitor));
+        }
+    }
+
+    public static class Builder {
+        private XmlElement xmlElement = new XmlElement();
+        
+        public Builder withName(String name) {
+            xmlElement.name = name;
+            return this;
+        }
+        
+        public Builder withAttributes(Stream<Attribute> attributes) {
+            attributes.forEach(a -> {
+                a.parent = xmlElement;
+                xmlElement.attributes.add(a);
+            });
+            return this;
+        }
+        
+        public Builder withAttribute(Attribute attribute) {
+            attribute.parent = xmlElement;
+            xmlElement.attributes.add(attribute);
+            return this;
+        }
+
+        public Builder withChildren(Stream<AbstractElement> children) {
+            children.forEach(c -> {
+                c.parent = xmlElement;
+                xmlElement.children.add(c);
+            });
+            return this;
+        }
+
+        public Builder withChild(AbstractElement child) {
+            child.parent = xmlElement;
+            xmlElement.children.add(child);
+            return this;
+        }
+        
+        public XmlElement build() {
+            return xmlElement;
         }
     }
 }

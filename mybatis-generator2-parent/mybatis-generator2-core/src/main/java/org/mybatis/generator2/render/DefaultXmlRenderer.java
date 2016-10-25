@@ -63,7 +63,7 @@ public class DefaultXmlRenderer implements XmlDomVisitor, OutputUtilities {
     @Override
     public boolean visit(XmlElement xmlElement) {
 
-        if (xmlElement.hasChildElements()) {
+        if (xmlElement.hasChildren()) {
             visitElementWithChildren(xmlElement);
         } else {
             visitElementWithoutChildren(xmlElement);

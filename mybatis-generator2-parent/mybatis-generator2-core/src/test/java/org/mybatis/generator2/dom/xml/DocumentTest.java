@@ -38,22 +38,30 @@ public class DocumentTest {
     }
 
     public static Document setupDocument() {
-        XmlElement mapperElement = new XmlElement("mapper");
-        mapperElement.addAttribute(new Attribute("namespace", "foo.BarMapper"));
         
-        XmlElement selectElement = new XmlElement("select");
-        selectElement.addAttribute(new Attribute("id", "selectBar"));
-        selectElement.addAttribute(new Attribute("resultType", "foo.Bar"));
+        XmlElement mapperElement = new XmlElement.Builder()
+                .withName("mapper")
+                .build();
         
-        selectElement.addElement(new TextElement("select * from bar"));
+        mapperElement = mapperElement.withAttribute(Attribute.of("namespace", "foo.BarMapper"));
+
+        XmlElement ifElement = new XmlElement.Builder()
+                .withName("if")
+                .withAttribute(Attribute.of("test", "_parameter != null"))
+                .withChild(TextElement.of("where foo = #{value}"))
+                .build();
+
+        XmlElement selectElement = new XmlElement.Builder()
+                .withName("select")
+                .withAttribute(Attribute.of("id", "selectBar"))
+                .withAttribute(Attribute.of("resultType", "foo.Bar"))
+                .withChild(TextElement.of("select * from bar"))
+                .withChild(ifElement)
+                .build();
+
+        mapperElement = mapperElement.withChild(selectElement);
         
-        XmlElement ifElement = new XmlElement("if");
-        ifElement.addAttribute(new Attribute("test", "_parameter != null"));
-        ifElement.addElement(new TextElement("where foo = #{value}"));
-        selectElement.addElement(ifElement);
-        mapperElement.addElement(selectElement);
-        
-        Document document = new Document(PUBLIC_ID, SYSTEM_ID, mapperElement);
+        Document document = Document.of(PUBLIC_ID, SYSTEM_ID, mapperElement);
         return document;
     }
 }
