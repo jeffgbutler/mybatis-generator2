@@ -5,20 +5,20 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public abstract class AbstractJavaElementContainer extends JavaDomNode {
-    
-    protected List<ClassDefinition> classDefinitions = new ArrayList<>();
-    protected List<EnumDefinition> enumDefinitions = new ArrayList<>();
-    protected List<InterfaceDefinition> interfaceDefinitions = new ArrayList<>();
 
-    public Stream<ClassDefinition> classDefinitions() {
+    private List<ClassDefinition> classDefinitions = new ArrayList<>();
+    private List<EnumDefinition> enumDefinitions = new ArrayList<>();
+    private List<InterfaceDefinition> interfaceDefinitions = new ArrayList<>();
+
+    public Stream<ClassDefinition> classes() {
         return classDefinitions.stream();
     }
 
-    public Stream<EnumDefinition> enumDefinitions() {
+    public Stream<EnumDefinition> enums() {
         return enumDefinitions.stream();
     }
 
-    public Stream<InterfaceDefinition> interfaceDefinitions() {
+    public Stream<InterfaceDefinition> interfaces() {
         return interfaceDefinitions.stream();
     }
     

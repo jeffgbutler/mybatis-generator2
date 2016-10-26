@@ -41,4 +41,8 @@ public interface JavaDomVisitor {
     default boolean visit(Parameter parameter) {
         return true;
     }
+
+    default boolean visit(Modifiers modifiers) {
+        return true;
+    }
 }

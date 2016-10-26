@@ -9,11 +9,11 @@ public class InterfaceDefinition extends AbstractTypeOrEnum {
     @Override
     public void accept(JavaDomVisitor visitor) {
         if (visitor.visit(this)) {
-            fieldDefinitions.stream().forEach(f -> f.accept(visitor));
-            methodDefinitions.stream().forEach(m -> m.accept(visitor));
-            classDefinitions.stream().forEach(t -> t.accept(visitor));
-            enumDefinitions.stream().forEach(t -> t.accept(visitor));
-            interfaceDefinitions.stream().forEach(t -> t.accept(visitor));
+            fields().forEach(f -> f.accept(visitor));
+            methods().forEach(m -> m.accept(visitor));
+            classes().forEach(t -> t.accept(visitor));
+            enums().forEach(t -> t.accept(visitor));
+            interfaces().forEach(t -> t.accept(visitor));
         }
     }
 

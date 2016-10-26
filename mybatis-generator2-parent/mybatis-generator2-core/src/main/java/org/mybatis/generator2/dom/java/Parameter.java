@@ -1,16 +1,22 @@
 package org.mybatis.generator2.dom.java;
 
+import java.util.Optional;
+
 public class Parameter extends JavaDomNode {
 
+    private Modifiers modifiers;
     private String name;
     private String type;
     private boolean isVarargs;
-    private boolean isFinal;
 
     private Parameter() {
         super();
     }
 
+    public Optional<Modifiers> getModifiers() {
+        return Optional.ofNullable(modifiers);
+    }
+    
     public String getName() {
         return name;
     }
@@ -21,10 +27,6 @@ public class Parameter extends JavaDomNode {
     
     public boolean isVarArgs() {
         return isVarargs;
-    }
-    
-    public boolean isFinal() {
-        return isFinal;
     }
     
     @Override
@@ -39,14 +41,15 @@ public class Parameter extends JavaDomNode {
             parameter.name = name;
             parameter.type = type;
         }
-        
-        public Builder isVarArgs(boolean isVarArgs) {
-            parameter.isVarargs = isVarArgs;
+
+        public Builder withModifiers(Modifiers modifiers) {
+            modifiers.parent = parameter;
+            parameter.modifiers = modifiers;
             return this;
         }
         
-        public Builder isFinal(boolean isFinal) {
-            parameter.isFinal = isFinal;
+        public Builder isVarArgs(boolean isVarArgs) {
+            parameter.isVarargs = isVarArgs;
             return this;
         }
         

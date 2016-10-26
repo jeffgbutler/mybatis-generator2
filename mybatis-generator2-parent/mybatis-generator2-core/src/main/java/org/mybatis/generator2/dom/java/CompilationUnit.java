@@ -28,10 +28,9 @@ public class CompilationUnit extends AbstractJavaElementContainer {
     @Override
     public void accept(JavaDomVisitor visitor) {
         if (visitor.visit(this)) {
-            importDefinitions.stream().forEach(i -> i.accept(visitor));
-            classDefinitions.stream().forEach(t -> t.accept(visitor));
-            enumDefinitions.stream().forEach(t -> t.accept(visitor));
-            interfaceDefinitions.stream().forEach(t -> t.accept(visitor));
+            classes().forEach(t -> t.accept(visitor));
+            enums().forEach(t -> t.accept(visitor));
+            interfaces().forEach(t -> t.accept(visitor));
         }
     }
     
