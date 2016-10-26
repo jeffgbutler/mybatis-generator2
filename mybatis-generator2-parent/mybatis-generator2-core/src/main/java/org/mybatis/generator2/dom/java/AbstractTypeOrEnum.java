@@ -9,7 +9,7 @@ public abstract class AbstractTypeOrEnum extends AbstractJavaElementContainer {
 
     private JavaDoc javaDoc;
     private Modifiers modifiers;
-    private String name;
+    String name;
     private List<FieldDefinition> fieldDefinitions = new ArrayList<>();
     private List<MethodDefinition> methodDefinitions = new ArrayList<>();
     private List<String> superInterfaces = new ArrayList<>();
@@ -49,11 +49,6 @@ public abstract class AbstractTypeOrEnum extends AbstractJavaElementContainer {
         public T withModifiers(Modifiers modifiers) {
             modifiers.parent = getConcreteItem();
             getConcreteItem().modifiers = modifiers;
-            return getThis();
-        }
-        
-        public T withName(String name) {
-            getConcreteItem().name = name;
             return getThis();
         }
         

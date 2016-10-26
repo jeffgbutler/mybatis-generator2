@@ -31,6 +31,10 @@ public class EnumDefinition extends AbstractTypeOrEnum {
     public static class Builder extends AbstractTypeOrEnumBuilder<Builder> {
         private EnumDefinition enumDefinition = new EnumDefinition();
         
+        public Builder(String name) {
+            enumDefinition.name = name;
+        }
+        
         public Builder withEnumConstant(EnumConstantDefinition enumConstant) {
             enumConstant.parent = enumDefinition;
             enumDefinition.enumConstantDefinitions.add(enumConstant);

@@ -9,8 +9,7 @@ public class InterfaceDefinitionTest {
 
     @Test
     public void testGetters() {
-        InterfaceDefinition interfaceDefinition = new InterfaceDefinition.Builder()
-                .withName("fred")
+        InterfaceDefinition interfaceDefinition = new InterfaceDefinition.Builder("fred")
                 .build();
         assertThat(interfaceDefinition.getName(), is("fred"));
     }

@@ -31,10 +31,14 @@ public class MethodDefinition extends JavaDomNode {
         return Optional.ofNullable(modifiers);
     }
 
-    public String getReturnType() {
-        return returnType;
+    public Optional<String> getReturnType() {
+        return Optional.ofNullable(returnType);
     }
 
+    public boolean isConstructor() {
+        return returnType == null;
+    }
+    
     public String getName() {
         return name;
     }

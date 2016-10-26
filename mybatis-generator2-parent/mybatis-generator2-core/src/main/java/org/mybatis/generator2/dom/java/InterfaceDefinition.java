@@ -20,6 +20,10 @@ public class InterfaceDefinition extends AbstractTypeOrEnum {
     public static class Builder extends AbstractTypeOrEnumBuilder<Builder> {
         private InterfaceDefinition interfaceDefinition = new InterfaceDefinition();
         
+        public Builder(String name) {
+            interfaceDefinition.name = name;
+        }
+        
         @Override
         protected InterfaceDefinition getConcreteItem() {
             return interfaceDefinition;

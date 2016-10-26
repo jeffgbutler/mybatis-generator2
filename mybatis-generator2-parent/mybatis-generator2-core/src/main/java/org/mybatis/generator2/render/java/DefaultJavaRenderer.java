@@ -43,13 +43,13 @@ public class DefaultJavaRenderer {
         
         @Override
         public boolean visit(CompilationUnit compilationUnit) {
-            if (stringHasValue(compilationUnit.getPackage())) {
+            compilationUnit.getPackage().ifPresent(p -> {
                 buffer.append("package ");
-                buffer.append(compilationUnit.getPackage());
+                buffer.append(p);
                 buffer.append(';');
                 newLine(buffer);
                 newLine(buffer);
-            }
+            });
             
             return true;
         }
@@ -68,8 +68,18 @@ public class DefaultJavaRenderer {
         public boolean visit(ClassDefinition classDefinition) {
             classDefinition.getJavaDoc().ifPresent(j -> j.accept(this));
             classDefinition.getModifiers().ifPresent(m -> m.accept(this));
-            
+            buffer.append("class ");
+            buffer.append(classDefinition.getName());
+            buffer.append(" {");
+            indentLevel++;
             return true;
+        }
+        
+        @Override
+        public void endVisit(ClassDefinition classDefinition) {
+            indentLevel--;
+            newLine(buffer);
+            buffer.append('}');
         }
         
         @Override

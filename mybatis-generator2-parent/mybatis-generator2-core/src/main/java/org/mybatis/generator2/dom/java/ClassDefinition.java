@@ -1,5 +1,7 @@
 package org.mybatis.generator2.dom.java;
 
+import java.util.Optional;
+
 public class ClassDefinition extends AbstractTypeOrEnum {
     
     private String superClass;
@@ -8,8 +10,8 @@ public class ClassDefinition extends AbstractTypeOrEnum {
         super();
     }
     
-    public String getSuperClass() {
-        return superClass;
+    public Optional<String> getSuperClass() {
+        return Optional.ofNullable(superClass);
     }
 
     /**
@@ -27,10 +29,15 @@ public class ClassDefinition extends AbstractTypeOrEnum {
             enums().forEach(t -> t.accept(visitor));
             interfaces().forEach(t -> t.accept(visitor));
         }
+        visitor.endVisit(this);
     }
     
     public static class Builder extends AbstractTypeOrEnumBuilder<Builder> {
         private ClassDefinition classDefinition = new ClassDefinition();
+        
+        public Builder(String name) {
+            classDefinition.name = name;
+        }
         
         public Builder withSuperClass(String superClass) {
             classDefinition.superClass = superClass;

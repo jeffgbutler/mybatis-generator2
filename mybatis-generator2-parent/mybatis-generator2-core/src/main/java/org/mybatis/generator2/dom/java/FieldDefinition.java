@@ -35,20 +35,16 @@ public class FieldDefinition extends JavaDomNode {
         return name;
     }
 
-    public String getInitializationString() {
-        return initializationString;
+    public Optional<String> getInitializationString() {
+        return Optional.ofNullable(initializationString);
     }
     
     public static class Builder {
         private FieldDefinition fieldDefinition = new FieldDefinition();
-        
-        public Builder of(FieldDefinition other) {
-            fieldDefinition.javaDoc = other.javaDoc;
-            fieldDefinition.initializationString = other.initializationString;
-            fieldDefinition.name = other.name;
-            fieldDefinition.type = other.type;
-            fieldDefinition.modifiers = other.modifiers;
-            return this;
+
+        public Builder(String name, String type) {
+            fieldDefinition.name = name;
+            fieldDefinition.type = type;
         }
         
         public Builder withInitializationString(String initializationString) {
@@ -56,16 +52,6 @@ public class FieldDefinition extends JavaDomNode {
             return this;
         }
         
-        public Builder withName(String name) {
-            fieldDefinition.name = name;
-            return this;
-        }
-
-        public Builder withType(String type) {
-            fieldDefinition.type = type;
-            return this;
-        }
-
         public Builder withModifiers(Modifiers modifiers) {
             modifiers.parent = fieldDefinition;
             fieldDefinition.modifiers = modifiers;

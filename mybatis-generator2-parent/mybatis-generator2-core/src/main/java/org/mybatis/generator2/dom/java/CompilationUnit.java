@@ -1,6 +1,7 @@
 package org.mybatis.generator2.dom.java;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -21,8 +22,8 @@ public class CompilationUnit extends AbstractJavaElementContainer {
         return importDefinitions.stream().filter(i -> !i.isStatic()).sorted();
     }
     
-    public String getPackage() {
-        return _package;
+    public Optional<String> getPackage() {
+        return Optional.ofNullable(_package);
     }
 
     @Override

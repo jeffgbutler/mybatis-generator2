@@ -45,4 +45,8 @@ public interface JavaDomVisitor {
     default boolean visit(Modifiers modifiers) {
         return true;
     }
+
+    default void endVisit(ClassDefinition classDefinition) {
+        return;
+    }
 }
