@@ -19,7 +19,6 @@ public class EnumDefinition extends AbstractTypeOrEnum {
     @Override
     public void accept(JavaDomVisitor visitor) {
         if (visitor.visit(this)) {
-            enumConstants().forEach(e -> e.accept(visitor));
             fields().forEach(f -> f.accept(visitor));
             methods().forEach(m -> m.accept(visitor));
             classes().forEach(t -> t.accept(visitor));

@@ -38,6 +38,10 @@ public abstract class AbstractTypeOrEnum extends AbstractJavaElementContainer {
         return superInterfaces.stream();
     }
     
+    public boolean hasSuperInterfaces() {
+        return !superInterfaces.isEmpty();
+    }
+    
     protected abstract static class AbstractTypeOrEnumBuilder<T extends AbstractTypeOrEnumBuilder<T>> extends AbstractJavaElementContainerBuilder<T> {
         
         public T withJavaDoc(JavaDoc javaDoc) {

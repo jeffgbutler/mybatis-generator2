@@ -1,9 +1,8 @@
 package org.mybatis.generator2.render.java;
 
-import static org.mybatis.generator2.util.StringUtils.stringHasValue;
-
 import org.mybatis.generator2.dom.java.ClassDefinition;
 import org.mybatis.generator2.dom.java.CompilationUnit;
+import org.mybatis.generator2.dom.java.FieldDefinition;
 import org.mybatis.generator2.dom.java.JavaDoc;
 import org.mybatis.generator2.dom.java.JavaDomVisitor;
 import org.mybatis.generator2.dom.java.Modifiers;
@@ -51,6 +50,16 @@ public class DefaultJavaRenderer {
                 newLine(buffer);
             });
             
+            compilationUnit.staticImports().forEach(i -> {
+                buffer.append(i.toString());
+                newLine(buffer);
+            });
+            
+            compilationUnit.nonStaticImports().forEach(i -> {
+                buffer.append(i.toString());
+                newLine(buffer);
+            });
+            
             return true;
         }
         
@@ -70,7 +79,26 @@ public class DefaultJavaRenderer {
             classDefinition.getModifiers().ifPresent(m -> m.accept(this));
             buffer.append("class ");
             buffer.append(classDefinition.getName());
+            
+            classDefinition.getSuperClass().ifPresent(s -> {
+                buffer.append("extends ");
+                buffer.append(s);
+                buffer.append(' ');
+            });
+            
+            if (classDefinition.hasSuperInterfaces()) {
+                buffer.append("implements ");
+                classDefinition.superInterfaces().forEach(i -> {
+                    buffer.append(i);
+                    buffer.append(", ");
+                });
+                // remove last comma
+                buffer.setLength(buffer.length() - 2);
+                buffer.append(' ');
+            };
+                
             buffer.append(" {");
+            newLine(buffer);
             indentLevel++;
             return true;
         }
@@ -80,6 +108,7 @@ public class DefaultJavaRenderer {
             indentLevel--;
             newLine(buffer);
             buffer.append('}');
+            newLine(buffer);
         }
         
         @Override
@@ -89,6 +118,24 @@ public class DefaultJavaRenderer {
                 buffer.append(m.getKeyword());
                 buffer.append(' ');
             });
+            return true;
+        }
+        
+        @Override
+        public boolean visit(FieldDefinition fieldDefinition) {
+            fieldDefinition.getJavaDoc().ifPresent(j -> j.accept(this));
+            fieldDefinition.getModifiers().ifPresent(m -> m.accept(this));
+            buffer.append(fieldDefinition.getType());
+            buffer.append(' ');
+            buffer.append(fieldDefinition.getName());
+            
+            fieldDefinition.getInitializationString().ifPresent(i -> {
+                buffer.append(" = ");
+                buffer.append(i);
+            });
+            buffer.append(';');
+            newLine(buffer);
+            
             return true;
         }
     }

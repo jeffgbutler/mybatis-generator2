@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 
 public class CompilationUnit extends AbstractJavaElementContainer {
 
-    private String _package;
+    private String pakkage;
     private Set<ImportDefinition> importDefinitions = new HashSet<>();
     
     private CompilationUnit() {
@@ -23,7 +23,7 @@ public class CompilationUnit extends AbstractJavaElementContainer {
     }
     
     public Optional<String> getPackage() {
-        return Optional.ofNullable(_package);
+        return Optional.ofNullable(pakkage);
     }
 
     @Override
@@ -38,21 +38,21 @@ public class CompilationUnit extends AbstractJavaElementContainer {
     public static class Builder extends AbstractJavaElementContainerBuilder<Builder> {
         private CompilationUnit compilationUnit = new CompilationUnit();
         
-        public Builder withPackage(String _package) {
-            compilationUnit._package = _package;
+        public Builder withPackage(String pakkage) {
+            compilationUnit.pakkage = pakkage;
             return this;
         }
         
-        public Builder withImport(ImportDefinition _import) {
-            _import.parent = compilationUnit;
-            compilationUnit.importDefinitions.add(_import);
+        public Builder withImport(ImportDefinition importDefinition) {
+            importDefinition.parent = compilationUnit;
+            compilationUnit.importDefinitions.add(importDefinition);
             return this;
         }
 
         public Builder withImports(Stream<ImportDefinition> imports) {
-            imports.forEach(_import -> {
-                _import.parent = compilationUnit;
-                compilationUnit.importDefinitions.add(_import);
+            imports.forEach(importDefinition -> {
+                importDefinition.parent = compilationUnit;
+                compilationUnit.importDefinitions.add(importDefinition);
             });
             return this;
         }

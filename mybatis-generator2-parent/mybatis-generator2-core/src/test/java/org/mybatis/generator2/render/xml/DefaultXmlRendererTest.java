@@ -1,4 +1,4 @@
-package org.mybatis.generator2.render;
+package org.mybatis.generator2.render.xml;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
