@@ -14,12 +14,26 @@ public class ImportDefinition extends JavaDomNode implements Comparable<ImportDe
         visitor.visit(this);
     }
 
+    @Override
+    public JavaNodeType getNodeType() {
+        return JavaNodeType.IMPORT;
+    }
+    
+    @Override
+    public boolean allowsModifier(JavaModifier javaModifier) {
+        return false;
+    }
+
     public String getTypeName() {
         return typeName;
     }
 
     public boolean isStatic() {
         return isStatic;
+    }
+
+    public boolean isNonStatic() {
+        return !isStatic;
     }
 
     public boolean isWildcard() {

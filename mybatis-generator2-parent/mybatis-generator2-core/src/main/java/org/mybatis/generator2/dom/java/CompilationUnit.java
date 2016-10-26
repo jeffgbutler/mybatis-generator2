@@ -15,11 +15,11 @@ public class CompilationUnit extends AbstractJavaElementContainer {
     }
     
     public Stream<ImportDefinition> staticImports() {
-        return importDefinitions.stream().filter(i -> i.isStatic()).sorted();
+        return importDefinitions.stream().filter(ImportDefinition::isStatic).sorted();
     }
 
     public Stream<ImportDefinition> nonStaticImports() {
-        return importDefinitions.stream().filter(i -> !i.isStatic()).sorted();
+        return importDefinitions.stream().filter(ImportDefinition::isNonStatic).sorted();
     }
     
     public Optional<String> getPackage() {
@@ -35,6 +35,16 @@ public class CompilationUnit extends AbstractJavaElementContainer {
         }
     }
     
+    @Override
+    public JavaNodeType getNodeType() {
+        return JavaNodeType.COMPILATION_UNIT;
+    }
+    
+    @Override
+    public boolean allowsModifier(JavaModifier javaModifier) {
+        return false;
+    }
+
     public static class Builder extends AbstractJavaElementContainerBuilder<Builder> {
         private CompilationUnit compilationUnit = new CompilationUnit();
         

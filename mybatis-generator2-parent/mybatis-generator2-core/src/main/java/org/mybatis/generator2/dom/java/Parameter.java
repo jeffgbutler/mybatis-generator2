@@ -33,6 +33,20 @@ public class Parameter extends JavaDomNode {
     public void accept(JavaDomVisitor visitor) {
         visitor.visit(this);
     }
+    
+    @Override
+    public JavaNodeType getNodeType() {
+        return JavaNodeType.PARAMETER;
+    }
+    
+    @Override
+    public boolean allowsModifier(JavaModifier javaModifier) {
+        return javaModifier == JavaModifier.FINAL;
+    }
+
+    public static Parameter of(String name, String type) {
+        return new Builder(name, type).build();
+    }
 
     public static class Builder {
         private Parameter parameter = new Parameter();

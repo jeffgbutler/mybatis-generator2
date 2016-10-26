@@ -17,6 +17,37 @@ public class InterfaceDefinition extends AbstractTypeOrEnum {
         }
     }
 
+    @Override
+    public JavaNodeType getNodeType() {
+        return JavaNodeType.INTERFACE;
+    }
+    
+    @Override
+    public boolean allowsModifier(JavaModifier javaModifier) {
+        boolean rc;
+        
+        switch (javaModifier) {
+        case PUBLIC:
+        case STRICTFP:
+            rc = true;
+            break;
+            
+        case PROTECTED:
+        case PRIVATE:
+            rc = parent.getNodeType() == JavaNodeType.CLASS;
+            break;
+            
+        case STATIC:
+            rc = parent.getNodeType() != JavaNodeType.COMPILATION_UNIT;
+            break;
+            
+        default:
+            rc = false;
+        }
+        
+        return rc;
+    }
+
     public static class Builder extends AbstractTypeOrEnumBuilder<Builder> {
         private InterfaceDefinition interfaceDefinition = new InterfaceDefinition();
         

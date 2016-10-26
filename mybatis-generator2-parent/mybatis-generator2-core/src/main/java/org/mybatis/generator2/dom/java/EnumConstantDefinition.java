@@ -16,6 +16,16 @@ public class EnumConstantDefinition extends JavaDomNode {
         visitor.visit(this);
     }
     
+    @Override
+    public JavaNodeType getNodeType() {
+        return JavaNodeType.ENUM_CONSTANT;
+    }
+    
+    @Override
+    public boolean allowsModifier(JavaModifier javaModifier) {
+        return false;
+    }
+    
     public String getName() {
         return name;
     }

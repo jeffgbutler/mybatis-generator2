@@ -27,6 +27,29 @@ public class EnumDefinition extends AbstractTypeOrEnum {
         }
     }
     
+    @Override
+    public JavaNodeType getNodeType() {
+        return JavaNodeType.ENUM;
+    }
+    
+    @Override
+    public boolean allowsModifier(JavaModifier javaModifier) {
+        boolean rc;
+        
+        switch (javaModifier) {
+        case PUBLIC:
+        case PROTECTED:
+        case PRIVATE:
+        case STRICTFP:
+            rc = true;
+            break;
+        default:
+            rc = false;
+        }
+        
+        return rc;
+    }
+
     public static class Builder extends AbstractTypeOrEnumBuilder<Builder> {
         private EnumDefinition enumDefinition = new EnumDefinition();
         

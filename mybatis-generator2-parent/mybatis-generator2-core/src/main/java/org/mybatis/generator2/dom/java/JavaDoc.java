@@ -17,6 +17,16 @@ public class JavaDoc extends JavaDomNode {
         visitor.visit(this);
     }
 
+    @Override
+    public JavaNodeType getNodeType() {
+        return JavaNodeType.JAVADOC;
+    }
+    
+    @Override
+    public boolean allowsModifier(JavaModifier javaModifier) {
+        return false;
+    }
+
     public Stream<String> javaDocLines() {
         return javaDocLines.stream();
     }

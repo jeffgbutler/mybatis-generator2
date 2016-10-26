@@ -1,6 +1,20 @@
 package org.mybatis.generator2.dom.java;
 
 public abstract class JavaDomNode {
+    public enum JavaNodeType {
+        CLASS,
+        COMPILATION_UNIT,
+        ENUM,
+        ENUM_CONSTANT,
+        FIELD,
+        IMPORT,
+        INTERFACE,
+        JAVADOC,
+        METHOD,
+        MODIFIERS,
+        PARAMETER;
+    }
+    
     JavaDomNode parent;
 
     public JavaDomNode getParent() {
@@ -8,4 +22,6 @@ public abstract class JavaDomNode {
     }
     
     public abstract void accept(JavaDomVisitor visitor);
+    public abstract JavaNodeType getNodeType();
+    public abstract boolean allowsModifier(JavaModifier javaModifier);
 }

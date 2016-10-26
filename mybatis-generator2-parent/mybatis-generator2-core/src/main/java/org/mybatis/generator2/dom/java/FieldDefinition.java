@@ -19,6 +19,57 @@ public class FieldDefinition extends JavaDomNode {
         visitor.visit(this);
     }
 
+    @Override
+    public JavaNodeType getNodeType() {
+        return JavaNodeType.FIELD;
+    }
+
+    @Override
+    public boolean allowsModifier(JavaModifier javaModifier) {
+        boolean rc;
+        switch (parent.getNodeType()) {
+        case CLASS:
+        case ENUM:
+            rc = isModifierAllowedForClassField(javaModifier);
+            break;
+        
+        case INTERFACE:
+            rc = isModifierAllowedForInterfaceField(javaModifier);
+            break;
+            
+        default:
+            rc = false;
+        }
+
+        return rc;
+    }
+    
+    private boolean isModifierAllowedForClassField(JavaModifier javaModifier) {
+        boolean rc;
+        
+        switch (javaModifier) {
+        case PUBLIC:
+        case PROTECTED:
+        case PRIVATE:
+        case STATIC:
+        case FINAL:
+        case TRANSIENT:
+        case VOLATILE:
+            rc = true;
+            break;
+        
+        default:
+            rc = false;
+        }
+        
+        return rc;
+    }
+
+    private boolean isModifierAllowedForInterfaceField(JavaModifier javaModifier) {
+        // interface fields are implicitly public, static, final.  No need to specify that.
+        return false;
+    }
+
     public Optional<JavaDoc> getJavaDoc() {
         return Optional.ofNullable(javaDoc);
     }
