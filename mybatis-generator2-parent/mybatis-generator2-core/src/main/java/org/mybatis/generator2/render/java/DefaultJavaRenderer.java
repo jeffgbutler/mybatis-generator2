@@ -75,13 +75,12 @@ public class DefaultJavaRenderer {
         }
         
         @Override
-        public boolean visit(JavaDoc javaDoc) {
+        public void visit(JavaDoc javaDoc) {
             javaDoc.javaDocLines().forEach(l -> {
                 javaIndent(buffer, indentLevel);
                 buffer.append(l);
                 newLine(buffer);
             });
-            return true;
         }
         
         @Override
@@ -121,18 +120,17 @@ public class DefaultJavaRenderer {
         }
         
         @Override
-        public boolean visit(ModifierSet modifierSet) {
+        public void visit(ModifierSet modifierSet) {
             modifierSet.javaModifiers()
                 .filter(m -> m.isApplicable(modifierSet.getParent()))
                 .forEach(m -> {
                     buffer.append(m.getKeyword());
                     buffer.append(' ');
                 });
-            return true;
         }
         
         @Override
-        public boolean visit(FieldDefinition fieldDefinition) {
+        public void visit(FieldDefinition fieldDefinition) {
             fieldDefinition.getJavaDoc().ifPresent(j -> j.accept(this));
             javaIndent(buffer, indentLevel);
             fieldDefinition.getModifierSet().ifPresent(m -> m.accept(this));
@@ -146,12 +144,10 @@ public class DefaultJavaRenderer {
             });
             buffer.append(';');
             newLine(buffer);
-            
-            return true;
         }
         
         @Override
-        public boolean visit(MethodDefinition methodDefinition) {
+        public void visit(MethodDefinition methodDefinition) {
             newLine(buffer);
             methodDefinition.getJavaDoc().ifPresent(j -> j.accept(this));
             javaIndent(buffer, indentLevel);
@@ -191,17 +187,14 @@ public class DefaultJavaRenderer {
                 buffer.append(';');
             }
             newLine(buffer);
-            
-            return true;
         }
         
         @Override
-        public boolean visit(Parameter parameter) {
+        public void visit(Parameter parameter) {
             parameter.getModifierSet().ifPresent(m -> m.accept(this));
             buffer.append(parameter.getType());
             buffer.append(' ');
             buffer.append(parameter.getName());
-            return true;
         }
         
         private void handleBodyLine(String bodyline) {

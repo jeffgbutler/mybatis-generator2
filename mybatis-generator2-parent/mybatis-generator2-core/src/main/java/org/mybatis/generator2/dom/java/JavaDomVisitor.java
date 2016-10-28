@@ -2,8 +2,8 @@ package org.mybatis.generator2.dom.java;
 
 public interface JavaDomVisitor {
 
-    default boolean visit(MethodDefinition methodDefinition) {
-        return true;
+    default void visit(MethodDefinition methodDefinition) {
+        return;
     }
     
     default boolean visit(InterfaceDefinition interfaceDefinition) {
@@ -18,36 +18,36 @@ public interface JavaDomVisitor {
         return true;
     }
     
-    default boolean visit(EnumConstantDefinition enumConstantDefinition) {
-        return true;
+    default void visit(EnumConstantDefinition enumConstantDefinition) {
+        return;
     }
     
     default boolean visit(CompilationUnit compilationUnit) {
         return true;
     }
     
-    default boolean visit(FieldDefinition fieldDefinition) {
-        return true;
+    default void visit(FieldDefinition fieldDefinition) {
+        return;
     }
     
-    default boolean visit(ImportDefinition importDefinition) {
-        return true;
+    default void visit(ImportDefinition importDefinition) {
+        return;
     }
 
-    default boolean visit(JavaDoc javaDoc) {
-        return true;
+    default void visit(JavaDoc javaDoc) {
+        return;
     }
 
-    default boolean visit(Parameter parameter) {
-        return true;
+    default void visit(Parameter parameter) {
+        return;
     }
 
-    default boolean visit(ModifierSet modifierSet) {
-        return true;
+    default void visit(ModifierSet modifierSet) {
+        return;
     }
 
-    default boolean visit(Argument argument) {
-        return true;
+    default void visit(Argument argument) {
+        return;
     }
 
     default void endVisit(ClassDefinition classDefinition) {
