@@ -1,0 +1,19 @@
+1. All classes immutable
+
+2. If class has an inner collection:
+   a. Always use a Builder inner class.   Optionally write "of" methods for
+      reasonable defaults that use the Builder.
+   b. Write withXXX methods that create new objects and add the item to the list
+
+      public Parent withChild(Child child) {
+        return new Builder()
+          .withAttribute(attribute)  // copy non-collection attributes to the new object
+          .withChildren(children())  // adds existing children to the new object
+          .withChild(child)          // adds new child
+          .build();
+      }
+
+3. If class does not have inner collections, then
+   a. If class has 3 or less attributes, use static builder methods named "of"
+   b. If class has more then 3 attributes, use a Builder class.  Optionally
+      write "of" methods for reasonable defaults that use the Builder
