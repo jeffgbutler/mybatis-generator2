@@ -54,25 +54,4 @@ public class XmlDomVisitorTest {
         verify(visitor, times(0)).visit(any(TextElement.class));
         verify(visitor, times(1)).visit(any(XmlElement.class));
     }
-
-    @Test
-    public void testVisitorIsNotStoppedByAttributesOrTextElements() {
-        XmlDomVisitor visitor = spy(new XmlDomVisitor(){
-            @Override
-            public boolean visit(Attribute attribute) {
-                return false;
-            }
-            @Override
-            public boolean visit(TextElement textElement) {
-                return false;
-            }
-        });
-        Document document = DocumentTest.setupDocument();
-        document.accept(visitor);
-        
-        verify(visitor, times(4)).visit(any(Attribute.class));
-        verify(visitor, times(1)).visit(any(Document.class));
-        verify(visitor, times(2)).visit(any(TextElement.class));
-        verify(visitor, times(3)).visit(any(XmlElement.class));
-    }
 }
