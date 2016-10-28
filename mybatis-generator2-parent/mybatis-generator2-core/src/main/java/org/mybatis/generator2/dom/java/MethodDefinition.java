@@ -183,7 +183,7 @@ public class MethodDefinition extends JavaDomNode {
             methodDefinition.javaDoc = javaDoc;
             return this;
         }
-        
+
         public Builder withModifiers(Modifiers modifiers) {
             modifiers.parent = methodDefinition;
             methodDefinition.modifiers = modifiers;

@@ -93,9 +93,9 @@ public class FieldDefinition extends JavaDomNode {
     public static class Builder {
         private FieldDefinition fieldDefinition = new FieldDefinition();
 
-        public Builder(String name, String type) {
-            fieldDefinition.name = name;
+        public Builder(String type, String name) {
             fieldDefinition.type = type;
+            fieldDefinition.name = name;
         }
         
         public Builder withInitializationString(String initializationString) {

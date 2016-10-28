@@ -14,7 +14,7 @@ public class ModifiersTest {
         modifiers = modifiers.with(JavaModifier.PUBLIC);
         
         StringBuilder buffer = new StringBuilder();
-        modifiers.modifiers().forEach(m -> {
+        modifiers.javaModifiers().forEach(m -> {
             buffer.append(m.getKeyword());
             buffer.append(' ');
         });

@@ -42,6 +42,14 @@ public abstract class AbstractTypeOrEnum extends AbstractJavaElementContainer {
         return !superInterfaces.isEmpty();
     }
     
+    protected void acceptChildren(JavaDomVisitor visitor) {
+        fields().forEach(f -> f.accept(visitor));
+        methods().forEach(m -> m.accept(visitor));
+        classes().forEach(t -> t.accept(visitor));
+        enums().forEach(t -> t.accept(visitor));
+        interfaces().forEach(t -> t.accept(visitor));
+    }
+    
     protected abstract static class AbstractTypeOrEnumBuilder<T extends AbstractTypeOrEnumBuilder<T>> extends AbstractJavaElementContainerBuilder<T> {
         
         public T withJavaDoc(JavaDoc javaDoc) {

@@ -23,11 +23,7 @@ public class ClassDefinition extends AbstractTypeOrEnum {
     @Override
     public void accept(JavaDomVisitor visitor) {
         if (visitor.visit(this)) {
-            fields().forEach(f -> f.accept(visitor));
-            methods().forEach(m -> m.accept(visitor));
-            classes().forEach(t -> t.accept(visitor));
-            enums().forEach(t -> t.accept(visitor));
-            interfaces().forEach(t -> t.accept(visitor));
+            acceptChildren(visitor);
         }
         visitor.endVisit(this);
     }

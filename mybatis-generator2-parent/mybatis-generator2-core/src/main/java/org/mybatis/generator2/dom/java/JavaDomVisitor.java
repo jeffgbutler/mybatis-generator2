@@ -46,7 +46,19 @@ public interface JavaDomVisitor {
         return true;
     }
 
+    default boolean visit(Argument argument) {
+        return true;
+    }
+
     default void endVisit(ClassDefinition classDefinition) {
+        return;
+    }
+
+    default void endVisit(EnumDefinition enumDefinition) {
+        return;
+    }
+
+    default void endVisit(InterfaceDefinition interfaceDefinition) {
         return;
     }
 }

@@ -1,7 +1,7 @@
 package org.mybatis.generator2.render.xml;
 
-import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mybatis.generator2.test_support.ResourceFileMatcher.matchesResourceFile;
 
 import org.junit.Test;
 import org.mybatis.generator2.dom.xml.Attribute;
@@ -18,19 +18,7 @@ public class DefaultXmlRendererTest {
         DefaultXmlRenderer renderer = DefaultXmlRenderer.of(document);
         String content = renderer.render();
         
-        String targetContent = 
-            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + System.lineSeparator() +
-            "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">" + System.lineSeparator() +
-            "<mapper namespace=\"foo.BarMapper\">" + System.lineSeparator() +
-            "  <select id=\"selectBar\" resultType=\"foo.Bar\">" + System.lineSeparator() +
-            "    select * from bar" + System.lineSeparator() +
-            "    <if test=\"_parameter != null\">" + System.lineSeparator() +
-            "      where foo = #{value}" + System.lineSeparator() +
-            "    </if>" + System.lineSeparator() +
-            "  </select>" + System.lineSeparator() +
-            "</mapper>";
-                
-        assertThat(content, is(targetContent));
+        assertThat(content, matchesResourceFile("/org/mybatis/generator2/dom/xml/FullDocument.xml"));
     }
 
     @Test
@@ -41,11 +29,6 @@ public class DefaultXmlRendererTest {
         DefaultXmlRenderer renderer = DefaultXmlRenderer.of(document);
         String content = renderer.render();
         
-        String targetContent =
-            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + System.lineSeparator() +
-            "<!DOCTYPE root>" + System.lineSeparator() +
-            "<root foo=\"bar\" />";
-        
-        assertThat(content, is(targetContent));
+        assertThat(content, matchesResourceFile("/org/mybatis/generator2/dom/xml/EmptyDocument.xml"));
     }
 }

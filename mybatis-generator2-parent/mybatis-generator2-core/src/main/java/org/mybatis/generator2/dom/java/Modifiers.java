@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 
 public class Modifiers extends JavaDomNode {
 
-    private List<JavaModifier> modifiers = new ArrayList<>();
+    private List<JavaModifier> javaModifiers = new ArrayList<>();
     
     private Modifiers() {
         super();
@@ -29,57 +29,51 @@ public class Modifiers extends JavaDomNode {
     }
 
     public boolean isDefault() {
-        return modifiers.contains(JavaModifier.DEFAULT);
+        return javaModifiers.contains(JavaModifier.DEFAULT);
     }
     
     public boolean isStatic() {
-        return modifiers.contains(JavaModifier.STATIC);
+        return javaModifiers.contains(JavaModifier.STATIC);
     }
     
     public boolean isAbstract() {
-        return modifiers.contains(JavaModifier.ABSTRACT);
+        return javaModifiers.contains(JavaModifier.ABSTRACT);
     }
     
     public boolean isNative() {
-        return modifiers.contains(JavaModifier.NATIVE);
+        return javaModifiers.contains(JavaModifier.NATIVE);
     }
     
     /**
      * Returns modifiers in order recommended by JLS
      * @return
      */
-    public Stream<JavaModifier> modifiers() {
-        return modifiers.stream().sorted();
+    public Stream<JavaModifier> javaModifiers() {
+        return javaModifiers.stream().sorted();
     }
 
-    public Modifiers with(JavaModifier... modifiers) {
+    public Modifiers with(JavaModifier... javaModifiers) {
         return new Builder()
-                .withModifiers(modifiers())
-                .withModifiers(modifiers)
+                .withJavaModifiers(javaModifiers())
+                .withJavaModifiers(javaModifiers)
                 .build();
     }
     
-    public static Modifiers of(JavaModifier... modifiers) {
+    public static Modifiers of(JavaModifier... javaModifiers) {
         return new Builder()
-                .withModifiers(modifiers)
+                .withJavaModifiers(javaModifiers)
                 .build();
     }
     
     public static class Builder {
         private Modifiers modifiers = new Modifiers();
         
-        public Builder withModifier(JavaModifier modifier) {
-            modifiers.modifiers.add(modifier);
-            return this;
-        }
-
-        public Builder withModifiers(JavaModifier... modifiers) {
-            Arrays.stream(modifiers).forEach(this.modifiers.modifiers::add);
-            return this;
+        public Builder withJavaModifiers(JavaModifier... modifiers) {
+            return withJavaModifiers(Arrays.stream(modifiers));
         }
         
-        public Builder withModifiers(Stream<JavaModifier> modifiers) {
-            modifiers.forEach(this.modifiers.modifiers::add);
+        public Builder withJavaModifiers(Stream<JavaModifier> modifiers) {
+            modifiers.forEach(this.modifiers.javaModifiers::add);
             return this;
         }
         

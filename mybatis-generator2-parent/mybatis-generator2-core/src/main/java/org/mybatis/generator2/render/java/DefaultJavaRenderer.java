@@ -1,5 +1,7 @@
 package org.mybatis.generator2.render.java;
 
+import java.util.stream.Collectors;
+
 import org.mybatis.generator2.dom.java.ClassDefinition;
 import org.mybatis.generator2.dom.java.CompilationUnit;
 import org.mybatis.generator2.dom.java.FieldDefinition;
@@ -49,14 +51,21 @@ public class DefaultJavaRenderer {
                 buffer.append(p);
                 buffer.append(';');
                 newLine(buffer);
-                newLine(buffer);
             });
+            
+            if (compilationUnit.staticImports().count() > 0) {
+                newLine(buffer);
+            }
             
             compilationUnit.staticImports().forEach(i -> {
                 buffer.append(i.toString());
                 newLine(buffer);
             });
             
+            if (compilationUnit.nonStaticImports().count() > 0) {
+                newLine(buffer);
+            }
+
             compilationUnit.nonStaticImports().forEach(i -> {
                 buffer.append(i.toString());
                 newLine(buffer);
@@ -77,7 +86,9 @@ public class DefaultJavaRenderer {
         
         @Override
         public boolean visit(ClassDefinition classDefinition) {
+            newLine(buffer);
             classDefinition.getJavaDoc().ifPresent(j -> j.accept(this));
+            javaIndent(buffer, indentLevel);
             classDefinition.getModifiers().ifPresent(m -> m.accept(this));
             buffer.append("class ");
             buffer.append(classDefinition.getName());
@@ -90,11 +101,8 @@ public class DefaultJavaRenderer {
             
             if (classDefinition.hasSuperInterfaces()) {
                 buffer.append("implements ");
-                classDefinition.superInterfaces().forEach(i -> {
-                    buffer.append(i);
-                    buffer.append(", ");
-                });
-                stripTrailing(buffer, ", ");
+                buffer.append(classDefinition.superInterfaces()
+                        .collect(Collectors.joining(", ")));
                 buffer.append(' ');
             };
                 
@@ -107,19 +115,19 @@ public class DefaultJavaRenderer {
         @Override
         public void endVisit(ClassDefinition classDefinition) {
             indentLevel--;
-            newLine(buffer);
+            javaIndent(buffer, indentLevel);
             buffer.append('}');
             newLine(buffer);
         }
         
         @Override
         public boolean visit(Modifiers modifiers) {
-            modifiers.modifiers().forEach(m -> {
-                if (m.isApplicable(modifiers.getParent())) {
+            modifiers.javaModifiers()
+                .filter(m -> m.isApplicable(modifiers.getParent()))
+                .forEach(m -> {
                     buffer.append(m.getKeyword());
                     buffer.append(' ');
-                }
-            });
+                });
             return true;
         }
         
@@ -154,17 +162,19 @@ public class DefaultJavaRenderer {
             });
             buffer.append(methodDefinition.getName());
             buffer.append('(');
-            methodDefinition.parameters().forEach(p -> p.accept(this));
-            stripTrailing(buffer, ", ");
+            
+            methodDefinition.parameters().limit(1).forEach(p -> p.accept(this));
+            methodDefinition.parameters().skip(1).forEach(p -> {
+                buffer.append(", ");
+                p.accept(this);
+            });
+            
             buffer.append(") ");
             
             if (methodDefinition.hasExceptions()) {
                 buffer.append("throws ");
-                methodDefinition.exceptions().forEach(e -> {
-                    buffer.append(e);
-                    buffer.append(", ");
-                });
-                stripTrailing(buffer, ", ");
+                buffer.append(methodDefinition.exceptions()
+                        .collect(Collectors.joining(", ")));
             }
             
             if (methodDefinition.allowsBodyLines()) {
@@ -191,7 +201,6 @@ public class DefaultJavaRenderer {
             buffer.append(parameter.getType());
             buffer.append(' ');
             buffer.append(parameter.getName());
-            buffer.append(", ");
             return true;
         }
         
@@ -200,12 +209,6 @@ public class DefaultJavaRenderer {
             javaIndent(buffer, indentLevel);
             buffer.append(bodyline);
             newLine(buffer);
-        }
-        
-        private void stripTrailing(StringBuilder sb, String pattern) {
-            if (sb.toString().endsWith(pattern)) {
-                sb.setLength(sb.length() - pattern.length());
-            }
         }
     }
 }

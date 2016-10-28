@@ -44,16 +44,16 @@ public class Parameter extends JavaDomNode {
         return javaModifier == JavaModifier.FINAL;
     }
 
-    public static Parameter of(String name, String type) {
-        return new Builder(name, type).build();
+    public static Parameter of(String type, String name) {
+        return new Builder(type, name).build();
     }
 
     public static class Builder {
         private Parameter parameter = new Parameter();
         
-        public Builder(String name, String type) {
-            parameter.name = name;
+        public Builder(String type, String name) {
             parameter.type = type;
+            parameter.name = name;
         }
 
         public Builder withModifiers(Modifiers modifiers) {

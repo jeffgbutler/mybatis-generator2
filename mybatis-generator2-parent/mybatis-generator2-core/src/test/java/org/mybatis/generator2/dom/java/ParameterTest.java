@@ -8,7 +8,7 @@ public class ParameterTest {
 
     @Test
     public void testGetters() {
-        Parameter parameter = new Parameter.Builder("amount", "BigDecimal")
+        Parameter parameter = new Parameter.Builder("BigDecimal", "amount")
                 .withModifiers(Modifiers.of(JavaModifier.FINAL))
                 .isVarArgs(true)
                 .build();
@@ -18,7 +18,7 @@ public class ParameterTest {
 
         parameter.getModifiers().ifPresent(m -> {
             boolean isFinal = 
-                     m.modifiers().filter(jm -> jm == JavaModifier.FINAL).count() == 1l;
+                     m.javaModifiers().filter(jm -> jm == JavaModifier.FINAL).count() == 1l;
             assertThat(isFinal, is(true));
         });
         

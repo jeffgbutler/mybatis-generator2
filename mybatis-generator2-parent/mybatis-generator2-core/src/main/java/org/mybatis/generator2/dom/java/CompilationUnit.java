@@ -48,7 +48,7 @@ public class CompilationUnit extends AbstractJavaElementContainer {
     public static class Builder extends AbstractJavaElementContainerBuilder<Builder> {
         private CompilationUnit compilationUnit = new CompilationUnit();
         
-        public Builder withPackage(String pakkage) {
+        public Builder inPackage(String pakkage) {
             compilationUnit.pakkage = pakkage;
             return this;
         }

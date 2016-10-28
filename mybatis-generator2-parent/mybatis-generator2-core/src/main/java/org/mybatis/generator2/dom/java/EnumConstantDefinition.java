@@ -1,11 +1,16 @@
 package org.mybatis.generator2.dom.java;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public class EnumConstantDefinition extends JavaDomNode {
 
     private JavaDoc javaDoc;
     private String name;
+    private List<Argument> arguments = new ArrayList<>();
     
     private EnumConstantDefinition() {
         super();
@@ -33,18 +38,28 @@ public class EnumConstantDefinition extends JavaDomNode {
     public Optional<JavaDoc> getJavaDoc() {
         return Optional.ofNullable(javaDoc);
     }
-
-    public static EnumConstantDefinition of(String name) {
-        EnumConstantDefinition enumConstantDefinition = new EnumConstantDefinition();
-        enumConstantDefinition.name = name;
-        return enumConstantDefinition;
+    
+    public Stream<Argument> arguments() {
+        return arguments.stream();
     }
 
-    public static EnumConstantDefinition of(String name, JavaDoc javaDoc) {
+    public static EnumConstantDefinition of(String name, Argument...arguments) {
+        return of(name, null, arguments);
+    }
+
+    public static EnumConstantDefinition of(String name, JavaDoc javaDoc, Argument...arguments) {
         EnumConstantDefinition enumConstantDefinition = new EnumConstantDefinition();
         enumConstantDefinition.name = name;
-        javaDoc.parent = enumConstantDefinition;
-        enumConstantDefinition.javaDoc = javaDoc;
+        if (javaDoc != null) {
+            javaDoc.parent = enumConstantDefinition;
+            enumConstantDefinition.javaDoc = javaDoc;
+        }
+        
+        Arrays.stream(arguments).forEach(a -> {
+            a.parent = enumConstantDefinition;
+            enumConstantDefinition.arguments.add(a);
+        });
+        
         return enumConstantDefinition;
     }
 }

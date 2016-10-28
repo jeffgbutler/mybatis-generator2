@@ -2,6 +2,7 @@ package org.mybatis.generator2.dom.java;
 
 public abstract class JavaDomNode {
     public enum JavaNodeType {
+        ARGUMENT,
         CLASS,
         COMPILATION_UNIT,
         ENUM,
