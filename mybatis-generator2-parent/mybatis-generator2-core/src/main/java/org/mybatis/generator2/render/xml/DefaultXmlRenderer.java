@@ -43,13 +43,12 @@ public class DefaultXmlRenderer {
         }
         
         @Override
-        public boolean visit(Attribute attribute) {
+        public void visit(Attribute attribute) {
             buffer.append(' ');
             buffer.append(attribute.getName());
             buffer.append("=\""); //$NON-NLS-1$
             buffer.append(attribute.getValue());
             buffer.append('\"');
-            return true;
         }
 
         @Override
@@ -73,11 +72,10 @@ public class DefaultXmlRenderer {
         }
 
         @Override
-        public boolean visit(TextElement textElement) {
+        public void visit(TextElement textElement) {
             newLine(buffer);
             xmlIndent(buffer, indentLevel);
             buffer.append(textElement.getContent());
-            return true;
         }
 
         @Override
