@@ -4,7 +4,7 @@ import java.util.Optional;
 
 public class Parameter extends JavaDomNode {
 
-    private Modifiers modifiers;
+    private ModifierSet modifierSet;
     private String name;
     private String type;
     private boolean isVarargs;
@@ -13,8 +13,8 @@ public class Parameter extends JavaDomNode {
         super();
     }
 
-    public Optional<Modifiers> getModifiers() {
-        return Optional.ofNullable(modifiers);
+    public Optional<ModifierSet> getModifierSet() {
+        return Optional.ofNullable(modifierSet);
     }
     
     public String getName() {
@@ -56,9 +56,13 @@ public class Parameter extends JavaDomNode {
             parameter.name = name;
         }
 
-        public Builder withModifiers(Modifiers modifiers) {
-            modifiers.parent = parameter;
-            parameter.modifiers = modifiers;
+        public Builder withModifier(JavaModifier javaModifier) {
+            parameter.getModifierSet().orElseGet(() -> {
+                ModifierSet ms = new ModifierSet(parameter);
+                parameter.modifierSet = ms;
+                return ms;
+            }).javaModifiers.add(javaModifier);
+            
             return this;
         }
         

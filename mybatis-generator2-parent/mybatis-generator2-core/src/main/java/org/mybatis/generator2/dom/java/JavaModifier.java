@@ -30,7 +30,7 @@ public enum JavaModifier {
      * This method checks to see if a modifier is applicable in the context.
      * For example, the public modifier is not applicable to an interface method.
      *  
-     * @param modifiersParent the parent node of the {@link Modifiers} object that
+     * @param modifiersParent the parent node of the {@link ModifierSet} object that
      *    contains this modifier (could be a method, parameter, field, class, enum, interface, etc.)
      * @return true if the modifier can be applied to the parent node
      */

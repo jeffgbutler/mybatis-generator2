@@ -9,14 +9,14 @@ public class ParameterTest {
     @Test
     public void testGetters() {
         Parameter parameter = new Parameter.Builder("BigDecimal", "amount")
-                .withModifiers(Modifiers.of(JavaModifier.FINAL))
+                .withModifier(JavaModifier.FINAL)
                 .isVarArgs(true)
                 .build();
         assertThat(parameter.getName(), is("amount"));
         assertThat(parameter.getType(), is("BigDecimal"));
-        assertThat(parameter.getModifiers().isPresent(), is(true));
+        assertThat(parameter.getModifierSet().isPresent(), is(true));
 
-        parameter.getModifiers().ifPresent(m -> {
+        parameter.getModifierSet().ifPresent(m -> {
             boolean isFinal = 
                      m.javaModifiers().filter(jm -> jm == JavaModifier.FINAL).count() == 1l;
             assertThat(isFinal, is(true));

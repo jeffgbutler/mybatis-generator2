@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 public class MethodDefinition extends JavaDomNode {
 
     private JavaDoc javaDoc;
-    private Modifiers modifiers;
+    private ModifierSet modifierSet;
     private String returnType;
     private String name;
     private List<Parameter> parameters = new ArrayList<>();
@@ -103,8 +103,8 @@ public class MethodDefinition extends JavaDomNode {
         return Optional.ofNullable(javaDoc);
     }
 
-    public Optional<Modifiers> getModifiers() {
-        return Optional.ofNullable(modifiers);
+    public Optional<ModifierSet> getModifierSet() {
+        return Optional.ofNullable(modifierSet);
     }
 
     public Optional<String> getReturnType() {
@@ -152,19 +152,19 @@ public class MethodDefinition extends JavaDomNode {
     }
 
     private boolean isBodyAllowedInClass() {
-        if (modifiers == null) {
+        if (modifierSet == null) {
             return true;
         }
         
-        return !(modifiers.isAbstract() || modifiers.isNative());
+        return !(modifierSet.isAbstract() || modifierSet.isNative());
     }
 
     private boolean isBodyAllowedInInterface() {
-        if (modifiers == null) {
+        if (modifierSet == null) {
             return false;
         }
         
-        return modifiers.isDefault() || modifiers.isStatic();
+        return modifierSet.isDefault() || modifierSet.isStatic();
     }
 
     public Stream<String> bodyLines() {
@@ -184,12 +184,16 @@ public class MethodDefinition extends JavaDomNode {
             return this;
         }
 
-        public Builder withModifiers(Modifiers modifiers) {
-            modifiers.parent = methodDefinition;
-            methodDefinition.modifiers = modifiers;
+        public Builder withModifier(JavaModifier javaModifier) {
+            methodDefinition.getModifierSet().orElseGet(() -> {
+                ModifierSet ms = new ModifierSet(methodDefinition);
+                methodDefinition.modifierSet = ms;
+                return ms;
+            }).javaModifiers.add(javaModifier);
+            
             return this;
         }
-        
+
         public Builder withReturnType(String returnType) {
             methodDefinition.returnType = returnType;
             return this;

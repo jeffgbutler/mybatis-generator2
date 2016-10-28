@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 public abstract class AbstractTypeOrEnum extends AbstractJavaElementContainer {
 
     private JavaDoc javaDoc;
-    private Modifiers modifiers;
+    private ModifierSet modifierSet;
     String name;
     private List<FieldDefinition> fieldDefinitions = new ArrayList<>();
     private List<MethodDefinition> methodDefinitions = new ArrayList<>();
@@ -18,8 +18,8 @@ public abstract class AbstractTypeOrEnum extends AbstractJavaElementContainer {
         return Optional.ofNullable(javaDoc);
     }
     
-    public Optional<Modifiers> getModifiers() {
-        return Optional.ofNullable(modifiers);
+    public Optional<ModifierSet> getModifierSet() {
+        return Optional.ofNullable(modifierSet);
     }
     
     public String getName() {
@@ -58,9 +58,13 @@ public abstract class AbstractTypeOrEnum extends AbstractJavaElementContainer {
             return getThis();
         }
 
-        public T withModifiers(Modifiers modifiers) {
-            modifiers.parent = getConcreteItem();
-            getConcreteItem().modifiers = modifiers;
+        public T withModifier(JavaModifier javaModifier) {
+            getConcreteItem().getModifierSet().orElseGet(() -> {
+                ModifierSet ms = new ModifierSet(getConcreteItem());
+                getConcreteItem().modifierSet = ms;
+                return ms;
+            }).javaModifiers.add(javaModifier);
+            
             return getThis();
         }
         

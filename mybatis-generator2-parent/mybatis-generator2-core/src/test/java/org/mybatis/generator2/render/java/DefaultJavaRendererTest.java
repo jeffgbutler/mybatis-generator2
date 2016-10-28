@@ -13,7 +13,6 @@ import org.mybatis.generator2.dom.java.FieldDefinition;
 import org.mybatis.generator2.dom.java.ImportDefinition;
 import org.mybatis.generator2.dom.java.JavaModifier;
 import org.mybatis.generator2.dom.java.MethodDefinition;
-import org.mybatis.generator2.dom.java.Modifiers;
 import org.mybatis.generator2.dom.java.Parameter;
 
 public class DefaultJavaRendererTest {
@@ -23,7 +22,7 @@ public class DefaultJavaRendererTest {
         List<MethodDefinition> methods = new ArrayList<>();
         MethodDefinition md = new MethodDefinition.Builder("getAmount")
                 .withReturnType("BigDecimal")
-                .withModifiers(Modifiers.of(JavaModifier.PUBLIC))
+                .withModifier(JavaModifier.PUBLIC)
                 .withBodyLine("return amount;")
                 .build();
         methods.add(md);
@@ -31,13 +30,14 @@ public class DefaultJavaRendererTest {
         md = new MethodDefinition.Builder("setAmount")
                 .withReturnType("void")
                 .withParameter(Parameter.of("BigDecimal", "amount"))
-                .withModifiers(Modifiers.of(JavaModifier.PUBLIC))
+                .withModifier(JavaModifier.PUBLIC)
                 .withBodyLine("this.amount = amount;")
                 .build();
         methods.add(md);
         
         MethodDefinition addMethod = new MethodDefinition.Builder("add")
-                .withModifiers(Modifiers.of(JavaModifier.PUBLIC, JavaModifier.STATIC))
+                .withModifier(JavaModifier.PUBLIC)
+                .withModifier(JavaModifier.STATIC)
                 .withReturnType("int")
                 .withParameter(Parameter.of("int", "a"))
                 .withParameter(Parameter.of("int", "b"))
@@ -45,14 +45,14 @@ public class DefaultJavaRendererTest {
                 .build();
         
         FieldDefinition fd = new FieldDefinition.Builder("BigDecimal", "amount")
-                .withModifiers(Modifiers.of(JavaModifier.PRIVATE))
+                .withModifier(JavaModifier.PRIVATE)
                 .build();
         
         ClassDefinition cd = new ClassDefinition.Builder("TestClass")
                 .withField(fd)
                 .withMethods(methods.stream())
                 .withMethod(addMethod)
-                .withModifiers(Modifiers.of(JavaModifier.PUBLIC))
+                .withModifier(JavaModifier.PUBLIC)
                 .build();
         
         CompilationUnit compilationUnit = new CompilationUnit.Builder()
@@ -70,20 +70,20 @@ public class DefaultJavaRendererTest {
     public void testClassWithInnerClass() {
         MethodDefinition getAmountMethod = new MethodDefinition.Builder("getAmount")
                 .withReturnType("BigDecimal")
-                .withModifiers(Modifiers.of(JavaModifier.PUBLIC))
+                .withModifier(JavaModifier.PUBLIC)
                 .withBodyLine("return amount;")
                 .build();
         
         MethodDefinition constructor = new MethodDefinition.Builder("TestClass")
-                .withModifiers(Modifiers.of(JavaModifier.PRIVATE))
+                .withModifier(JavaModifier.PRIVATE)
                 .build();
         
         FieldDefinition fd = new FieldDefinition.Builder("BigDecimal", "amount")
-                .withModifiers(Modifiers.of(JavaModifier.PRIVATE))
+                .withModifier(JavaModifier.PRIVATE)
                 .build();
         
         ClassDefinition cd = new ClassDefinition.Builder("TestClass")
-                .withModifiers(Modifiers.of(JavaModifier.PUBLIC))
+                .withModifier(JavaModifier.PUBLIC)
                 .withField(fd)
                 .withMethod(constructor)
                 .withMethod(getAmountMethod)
@@ -104,12 +104,12 @@ public class DefaultJavaRendererTest {
     private ClassDefinition innerClass() {
         FieldDefinition fd = new FieldDefinition.Builder("testClass", "TestClass")
                 .withInitializationString("new TestClass()")
-                .withModifiers(Modifiers.of(JavaModifier.PRIVATE))
+                .withModifier(JavaModifier.PRIVATE)
                 .build();
         
         MethodDefinition withAmountMethod = new MethodDefinition.Builder("withAmount")
                 .withReturnType("Builder")
-                .withModifiers(Modifiers.of(JavaModifier.PUBLIC))
+                .withModifier(JavaModifier.PUBLIC)
                 .withParameter(Parameter.of("amount", "BigDecimal"))
                 .withBodyLine("testClass.amount = amount;")
                 .withBodyLine("return this;")
@@ -117,12 +117,13 @@ public class DefaultJavaRendererTest {
         
         MethodDefinition buildMethod = new MethodDefinition.Builder("build")
                 .withReturnType("TestClass")
-                .withModifiers(Modifiers.of(JavaModifier.PUBLIC))
+                .withModifier(JavaModifier.PUBLIC)
                 .withBodyLine("return testClass;")
                 .build();
 
         ClassDefinition classDefinition = new ClassDefinition.Builder("Builder")
-                .withModifiers(Modifiers.of(JavaModifier.PUBLIC, JavaModifier.STATIC))
+                .withModifier(JavaModifier.PUBLIC)
+                .withModifier(JavaModifier.STATIC)
                 .withField(fd)
                 .withMethod(withAmountMethod)
                 .withMethod(buildMethod)

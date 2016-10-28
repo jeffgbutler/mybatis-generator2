@@ -42,7 +42,7 @@ public interface JavaDomVisitor {
         return true;
     }
 
-    default boolean visit(Modifiers modifiers) {
+    default boolean visit(ModifierSet modifierSet) {
         return true;
     }
 

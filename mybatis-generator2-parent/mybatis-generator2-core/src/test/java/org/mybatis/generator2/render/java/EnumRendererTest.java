@@ -11,7 +11,6 @@ import org.mybatis.generator2.dom.java.EnumDefinition;
 import org.mybatis.generator2.dom.java.FieldDefinition;
 import org.mybatis.generator2.dom.java.JavaModifier;
 import org.mybatis.generator2.dom.java.MethodDefinition;
-import org.mybatis.generator2.dom.java.Modifiers;
 import org.mybatis.generator2.dom.java.Parameter;
 
 public class EnumRendererTest {
@@ -20,17 +19,18 @@ public class EnumRendererTest {
     public void testBasicEnum() {
         MethodDefinition constructor = new MethodDefinition.Builder("TestEnum")
                 // the PUBLIC modifier should be ignored for an enum
-                .withModifiers(Modifiers.of(JavaModifier.PUBLIC, JavaModifier.PRIVATE))
+                .withModifier(JavaModifier.PUBLIC)
+                .withModifier(JavaModifier.PRIVATE)
                 .withParameter(Parameter.of("int", "value"))
                 .withBodyLine("this.value = value;")
                 .build();
         
         FieldDefinition fd = new FieldDefinition.Builder("int", "value")
-                .withModifiers(Modifiers.of(JavaModifier.PRIVATE))
+                .withModifier(JavaModifier.PRIVATE)
                 .build();
 
         EnumDefinition ed = new EnumDefinition.Builder("TestEnum")
-                .withModifiers(Modifiers.of(JavaModifier.PUBLIC))
+                .withModifier(JavaModifier.PUBLIC)
                 .withEnumConstant(EnumConstantDefinition.of("FRED", Argument.of("1")))
                 .withEnumConstant(EnumConstantDefinition.of("WILMA", Argument.of("2")))
                 .withEnumConstant(EnumConstantDefinition.of("BARNEY", Argument.of("3")))

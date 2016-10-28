@@ -9,12 +9,13 @@ public class ModifiersTest {
 
     @Test
     public void testOrdering() {
-        Modifiers modifiers = Modifiers.of(JavaModifier.STRICTFP);
-        modifiers = modifiers.with(JavaModifier.STATIC);
-        modifiers = modifiers.with(JavaModifier.PUBLIC);
+        ModifierSet modifierSet = new ModifierSet(null);
+        modifierSet.javaModifiers.add(JavaModifier.STRICTFP);
+        modifierSet.javaModifiers.add(JavaModifier.STATIC);
+        modifierSet.javaModifiers.add(JavaModifier.PUBLIC);
         
         StringBuilder buffer = new StringBuilder();
-        modifiers.javaModifiers().forEach(m -> {
+        modifierSet.javaModifiers().forEach(m -> {
             buffer.append(m.getKeyword());
             buffer.append(' ');
         });

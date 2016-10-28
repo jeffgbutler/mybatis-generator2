@@ -8,7 +8,7 @@ import org.mybatis.generator2.dom.java.FieldDefinition;
 import org.mybatis.generator2.dom.java.JavaDoc;
 import org.mybatis.generator2.dom.java.JavaDomVisitor;
 import org.mybatis.generator2.dom.java.MethodDefinition;
-import org.mybatis.generator2.dom.java.Modifiers;
+import org.mybatis.generator2.dom.java.ModifierSet;
 import org.mybatis.generator2.dom.java.Parameter;
 import org.mybatis.generator2.render.OutputUtilities;
 
@@ -89,7 +89,7 @@ public class DefaultJavaRenderer {
             newLine(buffer);
             classDefinition.getJavaDoc().ifPresent(j -> j.accept(this));
             javaIndent(buffer, indentLevel);
-            classDefinition.getModifiers().ifPresent(m -> m.accept(this));
+            classDefinition.getModifierSet().ifPresent(m -> m.accept(this));
             buffer.append("class ");
             buffer.append(classDefinition.getName());
             
@@ -121,9 +121,9 @@ public class DefaultJavaRenderer {
         }
         
         @Override
-        public boolean visit(Modifiers modifiers) {
-            modifiers.javaModifiers()
-                .filter(m -> m.isApplicable(modifiers.getParent()))
+        public boolean visit(ModifierSet modifierSet) {
+            modifierSet.javaModifiers()
+                .filter(m -> m.isApplicable(modifierSet.getParent()))
                 .forEach(m -> {
                     buffer.append(m.getKeyword());
                     buffer.append(' ');
@@ -135,7 +135,7 @@ public class DefaultJavaRenderer {
         public boolean visit(FieldDefinition fieldDefinition) {
             fieldDefinition.getJavaDoc().ifPresent(j -> j.accept(this));
             javaIndent(buffer, indentLevel);
-            fieldDefinition.getModifiers().ifPresent(m -> m.accept(this));
+            fieldDefinition.getModifierSet().ifPresent(m -> m.accept(this));
             buffer.append(fieldDefinition.getType());
             buffer.append(' ');
             buffer.append(fieldDefinition.getName());
@@ -155,7 +155,7 @@ public class DefaultJavaRenderer {
             newLine(buffer);
             methodDefinition.getJavaDoc().ifPresent(j -> j.accept(this));
             javaIndent(buffer, indentLevel);
-            methodDefinition.getModifiers().ifPresent(m -> m.accept(this));
+            methodDefinition.getModifierSet().ifPresent(m -> m.accept(this));
             methodDefinition.getReturnType().ifPresent(t -> {
                 buffer.append(t);
                 buffer.append(' ');
@@ -197,7 +197,7 @@ public class DefaultJavaRenderer {
         
         @Override
         public boolean visit(Parameter parameter) {
-            parameter.getModifiers().ifPresent(m -> m.accept(this));
+            parameter.getModifierSet().ifPresent(m -> m.accept(this));
             buffer.append(parameter.getType());
             buffer.append(' ');
             buffer.append(parameter.getName());
