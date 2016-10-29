@@ -1,6 +1,6 @@
 package org.mybatis.generator.test;
 
-public enum TestEnum {
+public enum BasicEnum {
     FRED(1),
     WILMA(2),
     BARNEY(3),
@@ -8,7 +8,11 @@ public enum TestEnum {
 
     private int value;
 
-    private TestEnum(int value) {
+    private BasicEnum(int value) {
         this.value = value;
+    }
+
+    public int getValue() {
+        return value;
     }
 }

@@ -39,6 +39,10 @@ public class EnumConstantDefinition extends JavaDomNode {
         return Optional.ofNullable(javaDoc);
     }
     
+    public boolean hasArguments() {
+        return !arguments.isEmpty();
+    }
+    
     public Stream<Argument> arguments() {
         return arguments.stream();
     }

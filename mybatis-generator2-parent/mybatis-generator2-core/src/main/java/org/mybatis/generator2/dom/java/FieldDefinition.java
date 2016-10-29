@@ -5,7 +5,7 @@ import java.util.Optional;
 public class FieldDefinition extends JavaDomNode {
 
     private JavaDoc javaDoc;
-    private ModifierSet modifierSet;
+    private ModifierSet modifierSet = new ModifierSet(this);
     private String type;
     private String name;
     private String initializationString;
@@ -74,8 +74,8 @@ public class FieldDefinition extends JavaDomNode {
         return Optional.ofNullable(javaDoc);
     }
     
-    public Optional<ModifierSet> getModifierSet() {
-        return Optional.ofNullable(modifierSet);
+    public ModifierSet getModifierSet() {
+        return modifierSet;
     }
 
     public String getType() {
@@ -104,12 +104,7 @@ public class FieldDefinition extends JavaDomNode {
         }
         
         public Builder withModifier(JavaModifier javaModifier) {
-            fieldDefinition.getModifierSet().orElseGet(() -> {
-                ModifierSet ms = new ModifierSet(fieldDefinition);
-                fieldDefinition.modifierSet = ms;
-                return ms;
-            }).javaModifiers.add(javaModifier);
-            
+            fieldDefinition.getModifierSet().addJavaModifier(javaModifier);
             return this;
         }
         

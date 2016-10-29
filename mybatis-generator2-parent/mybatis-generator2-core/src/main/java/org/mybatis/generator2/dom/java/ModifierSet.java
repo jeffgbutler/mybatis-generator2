@@ -6,13 +6,17 @@ import java.util.stream.Stream;
 
 public class ModifierSet extends JavaDomNode {
 
-    Set<JavaModifier> javaModifiers = new HashSet<>();
+    private Set<JavaModifier> javaModifiers = new HashSet<>();
     
     ModifierSet(JavaDomNode parent) {
         super();
         this.parent = parent;
     }
 
+    void addJavaModifier(JavaModifier javaModifier) {
+        javaModifiers.add(javaModifier);
+    }
+    
     @Override
     public void accept(JavaDomVisitor visitor) {
         visitor.visit(this);
@@ -42,6 +46,10 @@ public class ModifierSet extends JavaDomNode {
     
     public boolean isNative() {
         return javaModifiers.contains(JavaModifier.NATIVE);
+    }
+    
+    public boolean isFinal() {
+        return javaModifiers.contains(JavaModifier.FINAL);
     }
     
     /**

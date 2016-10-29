@@ -14,14 +14,7 @@ public class ParameterTest {
                 .build();
         assertThat(parameter.getName(), is("amount"));
         assertThat(parameter.getType(), is("BigDecimal"));
-        assertThat(parameter.getModifierSet().isPresent(), is(true));
-
-        parameter.getModifierSet().ifPresent(m -> {
-            boolean isFinal = 
-                     m.javaModifiers().filter(jm -> jm == JavaModifier.FINAL).count() == 1l;
-            assertThat(isFinal, is(true));
-        });
-        
+        assertThat(parameter.getModifierSet().isFinal(), is(true));
         assertThat(parameter.isVarArgs(), is(true));
     }
 }

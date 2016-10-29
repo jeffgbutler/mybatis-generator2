@@ -53,6 +53,19 @@ public class CompilationUnit extends AbstractJavaElementContainer {
             return this;
         }
         
+        /**
+         * Convenience method - create a non static, non-wildcard import
+         * 
+         * @param importDefinition
+         * @return
+         */
+        public Builder withImport(String importDefinition) {
+            ImportDefinition id = ImportDefinition.of(importDefinition);
+            id.parent = compilationUnit;
+            compilationUnit.importDefinitions.add(id);
+            return this;
+        }
+
         public Builder withImport(ImportDefinition importDefinition) {
             importDefinition.parent = compilationUnit;
             compilationUnit.importDefinitions.add(importDefinition);

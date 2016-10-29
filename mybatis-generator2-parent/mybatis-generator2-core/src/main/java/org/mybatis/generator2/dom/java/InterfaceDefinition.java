@@ -14,6 +14,11 @@ public class InterfaceDefinition extends AbstractTypeOrEnum {
         visitor.endVisit(this);
     }
 
+    @Override public void acceptConstructors(JavaDomVisitor visitor) {
+        // no constructors in interfaces
+        return;
+    }
+
     @Override
     public JavaNodeType getNodeType() {
         return JavaNodeType.INTERFACE;

@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 public class EnumDefinition extends AbstractTypeOrEnum {
 
     private List<EnumConstantDefinition> enumConstantDefinitions = new ArrayList<>();
+    private List<ConstructorDefinition> constructorDefinitions = new ArrayList<>();
     
     private EnumDefinition() {
         super();
@@ -14,6 +15,10 @@ public class EnumDefinition extends AbstractTypeOrEnum {
     
     public Stream<EnumConstantDefinition> enumConstants() {
         return enumConstantDefinitions.stream();
+    }
+
+    public Stream<ConstructorDefinition> constructors() {
+        return constructorDefinitions.stream();
     }
 
     @Override
@@ -24,6 +29,10 @@ public class EnumDefinition extends AbstractTypeOrEnum {
         visitor.endVisit(this);
     }
     
+    @Override public void acceptConstructors(JavaDomVisitor visitor) {
+        constructorDefinitions.forEach(c -> c.accept(visitor));
+    }
+
     @Override
     public JavaNodeType getNodeType() {
         return JavaNodeType.ENUM;
@@ -54,6 +63,20 @@ public class EnumDefinition extends AbstractTypeOrEnum {
             enumDefinition.name = name;
         }
         
+        public Builder withConstructor(ConstructorDefinition constructor) {
+            constructor.parent = enumDefinition;
+            enumDefinition.constructorDefinitions.add(constructor);
+            return this;
+        }
+
+        public Builder withConstructors(Stream<ConstructorDefinition> constructors) {
+            constructors.forEach(constructor -> {
+                constructor.parent = enumDefinition;
+                enumDefinition.constructorDefinitions.add(constructor);
+            });
+            return this;
+        }
+
         public Builder withEnumConstant(EnumConstantDefinition enumConstant) {
             enumConstant.parent = enumDefinition;
             enumDefinition.enumConstantDefinitions.add(enumConstant);

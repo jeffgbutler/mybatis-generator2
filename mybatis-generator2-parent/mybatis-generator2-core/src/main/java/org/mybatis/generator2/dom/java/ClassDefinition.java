@@ -1,10 +1,14 @@
 package org.mybatis.generator2.dom.java;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public class ClassDefinition extends AbstractTypeOrEnum {
     
     private String superClass;
+    private List<ConstructorDefinition> constructorDefinitions = new ArrayList<>();
 
     private ClassDefinition() {
         super();
@@ -12,6 +16,10 @@ public class ClassDefinition extends AbstractTypeOrEnum {
     
     public Optional<String> getSuperClass() {
         return Optional.ofNullable(superClass);
+    }
+    
+    public Stream<ConstructorDefinition> constructors() {
+        return constructorDefinitions.stream();
     }
 
     /**
@@ -26,6 +34,10 @@ public class ClassDefinition extends AbstractTypeOrEnum {
             acceptChildren(visitor);
         }
         visitor.endVisit(this);
+    }
+    
+    @Override public void acceptConstructors(JavaDomVisitor visitor) {
+        constructorDefinitions.forEach(c -> c.accept(visitor));
     }
 
     @Override
@@ -66,6 +78,20 @@ public class ClassDefinition extends AbstractTypeOrEnum {
             return this;
         }
 
+        public Builder withConstructor(ConstructorDefinition constructor) {
+            constructor.parent = classDefinition;
+            classDefinition.constructorDefinitions.add(constructor);
+            return this;
+        }
+
+        public Builder withConstructors(Stream<ConstructorDefinition> constructors) {
+            constructors.forEach(constructor -> {
+                constructor.parent = classDefinition;
+                classDefinition.constructorDefinitions.add(constructor);
+            });
+            return this;
+        }
+        
         @Override
         protected ClassDefinition getConcreteItem() {
             return classDefinition;

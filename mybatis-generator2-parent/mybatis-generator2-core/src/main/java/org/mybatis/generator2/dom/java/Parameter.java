@@ -1,10 +1,8 @@
 package org.mybatis.generator2.dom.java;
 
-import java.util.Optional;
-
 public class Parameter extends JavaDomNode {
 
-    private ModifierSet modifierSet;
+    private ModifierSet modifierSet = new ModifierSet(this);
     private String name;
     private String type;
     private boolean isVarargs;
@@ -13,8 +11,8 @@ public class Parameter extends JavaDomNode {
         super();
     }
 
-    public Optional<ModifierSet> getModifierSet() {
-        return Optional.ofNullable(modifierSet);
+    public ModifierSet getModifierSet() {
+        return modifierSet;
     }
     
     public String getName() {
@@ -57,12 +55,7 @@ public class Parameter extends JavaDomNode {
         }
 
         public Builder withModifier(JavaModifier javaModifier) {
-            parameter.getModifierSet().orElseGet(() -> {
-                ModifierSet ms = new ModifierSet(parameter);
-                parameter.modifierSet = ms;
-                return ms;
-            }).javaModifiers.add(javaModifier);
-            
+            parameter.getModifierSet().addJavaModifier(javaModifier);
             return this;
         }
         

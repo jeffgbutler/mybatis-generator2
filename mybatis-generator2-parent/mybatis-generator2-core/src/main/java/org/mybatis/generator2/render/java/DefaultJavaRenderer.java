@@ -2,15 +2,24 @@ package org.mybatis.generator2.render.java;
 
 import java.util.stream.Collectors;
 
+import org.mybatis.generator2.dom.java.AbstractMethodDefinition;
+import org.mybatis.generator2.dom.java.AbstractTypeOrEnum;
+import org.mybatis.generator2.dom.java.Argument;
 import org.mybatis.generator2.dom.java.ClassDefinition;
 import org.mybatis.generator2.dom.java.CompilationUnit;
+import org.mybatis.generator2.dom.java.ConstructorDefinition;
+import org.mybatis.generator2.dom.java.EnumConstantDefinition;
+import org.mybatis.generator2.dom.java.EnumDefinition;
 import org.mybatis.generator2.dom.java.FieldDefinition;
+import org.mybatis.generator2.dom.java.InterfaceDefinition;
 import org.mybatis.generator2.dom.java.JavaDoc;
+import org.mybatis.generator2.dom.java.JavaDomNode.JavaNodeType;
 import org.mybatis.generator2.dom.java.JavaDomVisitor;
 import org.mybatis.generator2.dom.java.MethodDefinition;
 import org.mybatis.generator2.dom.java.ModifierSet;
 import org.mybatis.generator2.dom.java.Parameter;
 import org.mybatis.generator2.render.OutputUtilities;
+import org.mybatis.generator2.util.StringUtils;
 
 public class DefaultJavaRenderer {
 
@@ -88,9 +97,10 @@ public class DefaultJavaRenderer {
             newLine(buffer);
             classDefinition.getJavaDoc().ifPresent(j -> j.accept(this));
             javaIndent(buffer, indentLevel);
-            classDefinition.getModifierSet().ifPresent(m -> m.accept(this));
+            classDefinition.getModifierSet().accept(this);
             buffer.append("class ");
             buffer.append(classDefinition.getName());
+            buffer.append(' ');
             
             classDefinition.getSuperClass().ifPresent(s -> {
                 buffer.append("extends ");
@@ -98,14 +108,9 @@ public class DefaultJavaRenderer {
                 buffer.append(' ');
             });
             
-            if (classDefinition.hasSuperInterfaces()) {
-                buffer.append("implements ");
-                buffer.append(classDefinition.superInterfaces()
-                        .collect(Collectors.joining(", ")));
-                buffer.append(' ');
-            };
+            addSuperInterfaces(classDefinition);
                 
-            buffer.append(" {");
+            buffer.append("{");
             newLine(buffer);
             indentLevel++;
             return true;
@@ -117,6 +122,107 @@ public class DefaultJavaRenderer {
             javaIndent(buffer, indentLevel);
             buffer.append('}');
             newLine(buffer);
+        }
+        
+        @Override
+        public boolean visit(EnumDefinition enumDefinition) {
+            newLine(buffer);
+            enumDefinition.getJavaDoc().ifPresent(j -> j.accept(this));
+            javaIndent(buffer, indentLevel);
+            enumDefinition.getModifierSet().accept(this);
+            buffer.append("enum ");
+            buffer.append(enumDefinition.getName());
+            buffer.append(' ');
+            
+            addSuperInterfaces(enumDefinition);
+
+            buffer.append("{");
+            newLine(buffer);
+            indentLevel++;
+
+            javaIndent(buffer, indentLevel);
+            enumDefinition.enumConstants().findFirst().ifPresent(c -> c.accept(this));
+            
+            enumDefinition.enumConstants().skip(1).forEach(c -> {
+                buffer.append(',');
+                newLine(buffer);
+                javaIndent(buffer, indentLevel);
+                c.accept(this);
+            });
+            buffer.append(';');
+            newLine(buffer);
+            
+            if (enumDefinition.hasFields()) {
+                newLine(buffer);
+            }
+            
+            return true;
+        }
+        
+        @Override
+        public void endVisit(EnumDefinition enumDefinition) {
+            indentLevel--;
+            javaIndent(buffer, indentLevel);
+            buffer.append('}');
+            newLine(buffer);
+        }
+
+        @Override
+        public boolean visit(InterfaceDefinition interfaceDefinition) {
+            newLine(buffer);
+            interfaceDefinition.getJavaDoc().ifPresent(j -> j.accept(this));
+            javaIndent(buffer, indentLevel);
+            interfaceDefinition.getModifierSet().accept(this);
+            buffer.append("interface ");
+            buffer.append(interfaceDefinition.getName());
+            buffer.append(' ');
+            
+            addSuperInterfaces(interfaceDefinition);
+                
+            buffer.append("{");
+            newLine(buffer);
+            indentLevel++;
+            return true;
+        }
+        
+        @Override
+        public void endVisit(InterfaceDefinition interfaceDefinition) {
+            indentLevel--;
+            javaIndent(buffer, indentLevel);
+            buffer.append('}');
+            newLine(buffer);
+        }
+
+        private void addSuperInterfaces(AbstractTypeOrEnum type) {
+            String prefix = type.getNodeType() == JavaNodeType.INTERFACE ? "extends " : "implements ";
+            if (type.hasSuperInterfaces()) {
+                buffer.append(type.superInterfaces()
+                        .collect(Collectors.joining(", ", prefix, " ")));
+            };
+        }
+        
+        @Override
+        public void visit(EnumConstantDefinition enumConstantDefinition) {
+            buffer.append(enumConstantDefinition.getName());
+            
+            if (enumConstantDefinition.hasArguments()) {
+                buffer.append('(');
+                enumConstantDefinition.arguments().limit(1).forEach(a -> a.accept(this));
+                enumConstantDefinition.arguments().skip(1).forEach(a -> {
+                    buffer.append(", ");
+                    a.accept(this);
+                });
+                buffer.append(')');
+            }
+        }
+        
+        @Override
+        public void visit(Argument argument) {
+            if (argument.isString()) {
+                buffer.append(String.format("\"%s\"", argument.getValue()));
+            } else {
+                buffer.append(argument.getValue());
+            }
         }
         
         @Override
@@ -133,7 +239,7 @@ public class DefaultJavaRenderer {
         public void visit(FieldDefinition fieldDefinition) {
             fieldDefinition.getJavaDoc().ifPresent(j -> j.accept(this));
             javaIndent(buffer, indentLevel);
-            fieldDefinition.getModifierSet().ifPresent(m -> m.accept(this));
+            fieldDefinition.getModifierSet().accept(this);
             buffer.append(fieldDefinition.getType());
             buffer.append(' ');
             buffer.append(fieldDefinition.getName());
@@ -151,57 +257,101 @@ public class DefaultJavaRenderer {
             newLine(buffer);
             methodDefinition.getJavaDoc().ifPresent(j -> j.accept(this));
             javaIndent(buffer, indentLevel);
-            methodDefinition.getModifierSet().ifPresent(m -> m.accept(this));
+            methodDefinition.getModifierSet().accept(this);
             methodDefinition.getReturnType().ifPresent(t -> {
                 buffer.append(t);
                 buffer.append(' ');
             });
             buffer.append(methodDefinition.getName());
-            buffer.append('(');
             
-            methodDefinition.parameters().limit(1).forEach(p -> p.accept(this));
-            methodDefinition.parameters().skip(1).forEach(p -> {
-                buffer.append(", ");
-                p.accept(this);
-            });
-            
-            buffer.append(") ");
-            
-            if (methodDefinition.hasExceptions()) {
-                buffer.append("throws ");
-                buffer.append(methodDefinition.exceptions()
-                        .collect(Collectors.joining(", ")));
-            }
-            
+            addMethodParameters(methodDefinition);
+            addMethodExceptions(methodDefinition);
+
             if (methodDefinition.allowsBodyLines()) {
-                buffer.append('{');
-                newLine(buffer);
-            
-                indentLevel++;
-                methodDefinition.bodyLines().forEach(this::handleBodyLine);
-                indentLevel--;
-            
-                javaIndent(buffer, indentLevel);
-                buffer.append('}');
+                addMethodBody(methodDefinition);
             } else {
                 buffer.append(';');
+                newLine(buffer);
             }
-            newLine(buffer);
         }
         
         @Override
-        public void visit(Parameter parameter) {
-            parameter.getModifierSet().ifPresent(m -> m.accept(this));
-            buffer.append(parameter.getType());
-            buffer.append(' ');
-            buffer.append(parameter.getName());
+        public void visit(ConstructorDefinition constructorDefinition) {
+            newLine(buffer);
+            constructorDefinition.getJavaDoc().ifPresent(j -> j.accept(this));
+            javaIndent(buffer, indentLevel);
+            constructorDefinition.getModifierSet().accept(this);
+            buffer.append(((AbstractTypeOrEnum) constructorDefinition.getParent()).getName());
+            
+            addMethodParameters(constructorDefinition);
+            addMethodExceptions(constructorDefinition);
+            addMethodBody(constructorDefinition);
+        }
+
+        private void addMethodParameters(AbstractMethodDefinition method) {
+            buffer.append('(');
+            method.parameters().limit(1).forEach(p -> p.accept(this));
+            method.parameters().skip(1).forEach(p -> {
+                buffer.append(", ");
+                p.accept(this);
+            });
+            buffer.append(")");
+        }
+        
+        private void addMethodExceptions(AbstractMethodDefinition method) {
+            if (method.hasExceptions()) {
+                buffer.append(method.exceptions()
+                        .collect(Collectors.joining(", ", " throws ", "")));
+            }
+        }
+        
+        private void addMethodBody(AbstractMethodDefinition method) {
+            buffer.append(" {");
+            newLine(buffer);
+            
+            indentLevel++;
+            method.bodyLines().forEach(this::handleBodyLine);
+            indentLevel--;
+            
+            javaIndent(buffer, indentLevel);
+            buffer.append('}');
+            newLine(buffer);
         }
         
         private void handleBodyLine(String bodyline) {
-            // TODO - handle blocks and switch statements
-            javaIndent(buffer, indentLevel);
-            buffer.append(bodyline);
-            newLine(buffer);
+            if (bodyline.startsWith("}")) {
+                indentLevel--;
+                writeBodyLine(bodyline);
+            } else if (bodyline.startsWith("case") || bodyline.startsWith("default")) {
+                indentLevel--;
+                writeBodyLine(bodyline);
+                indentLevel++;
+            } else {
+                writeBodyLine(bodyline);
+            }
+            
+            if (bodyline.endsWith("{")) { //$NON-NLS-1$
+                indentLevel++;
+            }
+        }
+        
+        private void writeBodyLine(String bodyline) {
+            if (StringUtils.stringHasValue(bodyline)) {
+                javaIndent(buffer, indentLevel);
+                buffer.append(bodyline);
+                newLine(buffer);
+            } else {
+                // for an empty line, don't write the spaces from the indent - just new line
+                newLine(buffer);
+            }
+        }
+
+        @Override
+        public void visit(Parameter parameter) {
+            parameter.getModifierSet().accept(this);
+            buffer.append(parameter.getType());
+            buffer.append(' ');
+            buffer.append(parameter.getName());
         }
     }
 }

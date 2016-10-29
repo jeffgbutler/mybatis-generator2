@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 public abstract class AbstractTypeOrEnum extends AbstractJavaElementContainer {
 
     private JavaDoc javaDoc;
-    private ModifierSet modifierSet;
+    private ModifierSet modifierSet = new ModifierSet(this);
     String name;
     private List<FieldDefinition> fieldDefinitions = new ArrayList<>();
     private List<MethodDefinition> methodDefinitions = new ArrayList<>();
@@ -18,8 +18,8 @@ public abstract class AbstractTypeOrEnum extends AbstractJavaElementContainer {
         return Optional.ofNullable(javaDoc);
     }
     
-    public Optional<ModifierSet> getModifierSet() {
-        return Optional.ofNullable(modifierSet);
+    public ModifierSet getModifierSet() {
+        return modifierSet;
     }
     
     public String getName() {
@@ -29,9 +29,17 @@ public abstract class AbstractTypeOrEnum extends AbstractJavaElementContainer {
     public Stream<FieldDefinition> fields() {
         return fieldDefinitions.stream();
     }
+    
+    public boolean hasFields() {
+        return !fieldDefinitions.isEmpty();
+    }
 
     public Stream<MethodDefinition> methods() {
         return methodDefinitions.stream();
+    }
+
+    public boolean hasMethods() {
+        return !methodDefinitions.isEmpty();
     }
 
     public Stream<String> superInterfaces() {
@@ -44,11 +52,14 @@ public abstract class AbstractTypeOrEnum extends AbstractJavaElementContainer {
     
     protected void acceptChildren(JavaDomVisitor visitor) {
         fields().forEach(f -> f.accept(visitor));
+        acceptConstructors(visitor);
         methods().forEach(m -> m.accept(visitor));
         classes().forEach(t -> t.accept(visitor));
         enums().forEach(t -> t.accept(visitor));
         interfaces().forEach(t -> t.accept(visitor));
     }
+    
+    protected abstract void acceptConstructors(JavaDomVisitor visitor);
     
     protected abstract static class AbstractTypeOrEnumBuilder<T extends AbstractTypeOrEnumBuilder<T>> extends AbstractJavaElementContainerBuilder<T> {
         
@@ -59,12 +70,7 @@ public abstract class AbstractTypeOrEnum extends AbstractJavaElementContainer {
         }
 
         public T withModifier(JavaModifier javaModifier) {
-            getConcreteItem().getModifierSet().orElseGet(() -> {
-                ModifierSet ms = new ModifierSet(getConcreteItem());
-                getConcreteItem().modifierSet = ms;
-                return ms;
-            }).javaModifiers.add(javaModifier);
-            
+            getConcreteItem().modifierSet.addJavaModifier(javaModifier);
             return getThis();
         }
         

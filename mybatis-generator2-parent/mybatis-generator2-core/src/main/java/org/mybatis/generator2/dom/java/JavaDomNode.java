@@ -5,6 +5,7 @@ public abstract class JavaDomNode {
         ARGUMENT,
         CLASS,
         COMPILATION_UNIT,
+        CONSTRUCTOR,
         ENUM,
         ENUM_CONSTANT,
         FIELD,

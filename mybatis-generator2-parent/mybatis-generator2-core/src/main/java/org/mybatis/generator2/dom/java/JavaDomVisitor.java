@@ -50,6 +50,10 @@ public interface JavaDomVisitor {
         return;
     }
 
+    default void visit(ConstructorDefinition constructorDefinition) {
+        return;
+    }
+    
     default void endVisit(ClassDefinition classDefinition) {
         return;
     }

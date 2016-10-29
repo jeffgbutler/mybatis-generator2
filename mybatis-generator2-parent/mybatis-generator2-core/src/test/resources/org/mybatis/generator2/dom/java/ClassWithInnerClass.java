@@ -2,10 +2,10 @@ package org.mybatis.generator.test;
 
 import java.math.BigDecimal;
 
-public class TestClass {
+public class ClassWithInnerClass {
     private BigDecimal amount;
 
-    private TestClass() {
+    private ClassWithInnerClass() {
     }
 
     public BigDecimal getAmount() {

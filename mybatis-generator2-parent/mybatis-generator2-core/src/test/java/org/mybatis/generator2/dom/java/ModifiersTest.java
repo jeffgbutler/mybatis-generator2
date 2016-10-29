@@ -10,9 +10,9 @@ public class ModifiersTest {
     @Test
     public void testOrdering() {
         ModifierSet modifierSet = new ModifierSet(null);
-        modifierSet.javaModifiers.add(JavaModifier.STRICTFP);
-        modifierSet.javaModifiers.add(JavaModifier.STATIC);
-        modifierSet.javaModifiers.add(JavaModifier.PUBLIC);
+        modifierSet.addJavaModifier(JavaModifier.STRICTFP);
+        modifierSet.addJavaModifier(JavaModifier.STATIC);
+        modifierSet.addJavaModifier(JavaModifier.PUBLIC);
         
         StringBuilder buffer = new StringBuilder();
         modifierSet.javaModifiers().forEach(m -> {

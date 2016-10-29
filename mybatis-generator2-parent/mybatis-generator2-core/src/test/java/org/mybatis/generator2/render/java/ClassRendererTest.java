@@ -9,55 +9,87 @@ import java.util.List;
 import org.junit.Test;
 import org.mybatis.generator2.dom.java.ClassDefinition;
 import org.mybatis.generator2.dom.java.CompilationUnit;
+import org.mybatis.generator2.dom.java.ConstructorDefinition;
 import org.mybatis.generator2.dom.java.FieldDefinition;
 import org.mybatis.generator2.dom.java.ImportDefinition;
 import org.mybatis.generator2.dom.java.JavaModifier;
 import org.mybatis.generator2.dom.java.MethodDefinition;
 import org.mybatis.generator2.dom.java.Parameter;
 
-public class DefaultJavaRendererTest {
+public class ClassRendererTest {
 
     @Test
     public void testBasicClass() {
         List<MethodDefinition> methods = new ArrayList<>();
-        MethodDefinition md = new MethodDefinition.Builder("getAmount")
-                .withReturnType("BigDecimal")
+        MethodDefinition md = new MethodDefinition.Builder("BigDecimal", "getAmount")
                 .withModifier(JavaModifier.PUBLIC)
                 .withBodyLine("return amount;")
                 .build();
         methods.add(md);
         
-        md = new MethodDefinition.Builder("setAmount")
-                .withReturnType("void")
+        md = new MethodDefinition.Builder("void", "setAmount")
                 .withParameter(Parameter.of("BigDecimal", "amount"))
                 .withModifier(JavaModifier.PUBLIC)
                 .withBodyLine("this.amount = amount;")
                 .build();
         methods.add(md);
         
-        MethodDefinition addMethod = new MethodDefinition.Builder("add")
+        MethodDefinition addMethod = new MethodDefinition.Builder("int", "add")
                 .withModifier(JavaModifier.PUBLIC)
                 .withModifier(JavaModifier.STATIC)
-                .withReturnType("int")
                 .withParameter(Parameter.of("int", "a"))
                 .withParameter(Parameter.of("int", "b"))
                 .withBodyLine("return a + b;")
+                .build();
+        
+        List<String> bodyLines = new ArrayList<>();
+        bodyLines.add("boolean bool = false;");
+        bodyLines.add("");
+        bodyLines.add("if (bool) {");
+        bodyLines.add("System.out.println(\"It's true!\");");
+        bodyLines.add("} else {");
+        bodyLines.add("System.out.println(\"It's false!\");");
+        bodyLines.add("}");
+        bodyLines.add("");
+        bodyLines.add("int number = 0;");
+        bodyLines.add("");
+        bodyLines.add("switch (number) {");
+        bodyLines.add("case 0:");
+        bodyLines.add("case 1:");
+        bodyLines.add("System.out.println(\"It's zero or one!\");");
+        bodyLines.add("break;");
+        bodyLines.add("case 2:");
+        bodyLines.add("System.out.println(\"It's two!\");");
+        bodyLines.add("break;");
+        bodyLines.add("");
+        bodyLines.add("default:");
+        bodyLines.add("System.out.println(\"It's not zero or one or two!\");");
+        bodyLines.add("}");
+        bodyLines.add("");
+        bodyLines.add("System.out.println(\"End of method\");");
+        
+        MethodDefinition weirdMethod = new MethodDefinition.Builder("void", "weirdMethod")
+                .withModifier(JavaModifier.PUBLIC)
+                .withBodyLines(bodyLines.stream())
                 .build();
         
         FieldDefinition fd = new FieldDefinition.Builder("BigDecimal", "amount")
                 .withModifier(JavaModifier.PRIVATE)
                 .build();
         
-        ClassDefinition cd = new ClassDefinition.Builder("TestClass")
+        ClassDefinition cd = new ClassDefinition.Builder("BasicClass")
+                .withModifier(JavaModifier.PUBLIC)
+                .withSuperInterface("Serializable")
                 .withField(fd)
                 .withMethods(methods.stream())
                 .withMethod(addMethod)
-                .withModifier(JavaModifier.PUBLIC)
+                .withMethod(weirdMethod)
                 .build();
         
         CompilationUnit compilationUnit = new CompilationUnit.Builder()
                 .inPackage("org.mybatis.generator.test")
                 .withImport(ImportDefinition.of("java.math.BigDecimal"))
+                .withImport("java.io.Serializable")
                 .withClassDefinition(cd)
                 .build();
         
@@ -68,13 +100,12 @@ public class DefaultJavaRendererTest {
 
     @Test
     public void testClassWithInnerClass() {
-        MethodDefinition getAmountMethod = new MethodDefinition.Builder("getAmount")
-                .withReturnType("BigDecimal")
+        MethodDefinition getAmountMethod = new MethodDefinition.Builder("BigDecimal", "getAmount")
                 .withModifier(JavaModifier.PUBLIC)
                 .withBodyLine("return amount;")
                 .build();
         
-        MethodDefinition constructor = new MethodDefinition.Builder("TestClass")
+        ConstructorDefinition constructor = new ConstructorDefinition.Builder()
                 .withModifier(JavaModifier.PRIVATE)
                 .build();
         
@@ -82,10 +113,10 @@ public class DefaultJavaRendererTest {
                 .withModifier(JavaModifier.PRIVATE)
                 .build();
         
-        ClassDefinition cd = new ClassDefinition.Builder("TestClass")
+        ClassDefinition cd = new ClassDefinition.Builder("ClassWithInnerClass")
                 .withModifier(JavaModifier.PUBLIC)
                 .withField(fd)
-                .withMethod(constructor)
+                .withConstructor(constructor)
                 .withMethod(getAmountMethod)
                 .withClassDefinition(innerClass())
                 .build();
@@ -107,16 +138,14 @@ public class DefaultJavaRendererTest {
                 .withModifier(JavaModifier.PRIVATE)
                 .build();
         
-        MethodDefinition withAmountMethod = new MethodDefinition.Builder("withAmount")
-                .withReturnType("Builder")
+        MethodDefinition withAmountMethod = new MethodDefinition.Builder("Builder", "withAmount")
                 .withModifier(JavaModifier.PUBLIC)
                 .withParameter(Parameter.of("amount", "BigDecimal"))
                 .withBodyLine("testClass.amount = amount;")
                 .withBodyLine("return this;")
                 .build();
         
-        MethodDefinition buildMethod = new MethodDefinition.Builder("build")
-                .withReturnType("TestClass")
+        MethodDefinition buildMethod = new MethodDefinition.Builder("TestClass", "build")
                 .withModifier(JavaModifier.PUBLIC)
                 .withBodyLine("return testClass;")
                 .build();

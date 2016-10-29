@@ -27,14 +27,34 @@ public class Argument extends JavaDomNode {
         return value;
     }
 
+    /**
+     * If true a renderer should surround the value with quotation marks
+     * 
+     * @return
+     */
     public boolean isString() {
         return isString;
     }
 
-    public static Argument of(String value) {
-        return of(value, false);
+    public static Argument of(int value) {
+        return of(Integer.toString(value), false);
     }
 
+    public static Argument of(String value) {
+        return of(value, true);
+    }
+    
+    /**
+     * Use this builder if the argument is something other than an int or a string.
+     * For example:
+     * 
+     * Argument argument = Argument.of("LocalDate.now()", false);
+     * 
+     * @param value
+     * @param isString if the value is a string, then the renderers are expected
+     *   to surround the value with quotation marks
+     * @return
+     */
     public static Argument of(String value, boolean isString) {
         Argument argument = new Argument();
         argument.value = value;

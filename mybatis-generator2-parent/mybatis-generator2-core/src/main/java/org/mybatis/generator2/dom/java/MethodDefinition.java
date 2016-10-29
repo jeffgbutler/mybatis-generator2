@@ -1,26 +1,15 @@
 package org.mybatis.generator2.dom.java;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 /**
- * If a method has a null return type, it is considered to be a constructor.
- * If a regular method does not have a return type, then set the return type to "void".
- * 
  * @author Jeff Butler
  *
  */
-public class MethodDefinition extends JavaDomNode {
+public class MethodDefinition extends AbstractMethodDefinition {
 
-    private JavaDoc javaDoc;
-    private ModifierSet modifierSet;
     private String returnType;
     private String name;
-    private List<Parameter> parameters = new ArrayList<>();
-    private List<String> bodyLines = new ArrayList<>();
-    private List<String> exceptions = new ArrayList<>();
     
     private MethodDefinition() {
         super();
@@ -63,16 +52,13 @@ public class MethodDefinition extends JavaDomNode {
         case PUBLIC:
         case PROTECTED:
         case PRIVATE:
-            rc = true;
-            break;
-            
         case ABSTRACT:
         case STATIC:
         case FINAL:
         case SYNCHRONIZED:
         case NATIVE:
         case STRICTFP:
-            rc = !isConstructor();
+            rc = true;
             break;
         
         default:
@@ -99,36 +85,12 @@ public class MethodDefinition extends JavaDomNode {
         return rc;
     }
 
-    public Optional<JavaDoc> getJavaDoc() {
-        return Optional.ofNullable(javaDoc);
-    }
-
-    public Optional<ModifierSet> getModifierSet() {
-        return Optional.ofNullable(modifierSet);
-    }
-
     public Optional<String> getReturnType() {
         return Optional.ofNullable(returnType);
     }
 
-    public boolean isConstructor() {
-        return returnType == null;
-    }
-    
-    public boolean hasExceptions() {
-        return !exceptions.isEmpty();
-    }
-    
-    public Stream<String> exceptions() {
-        return exceptions.stream();
-    }
-    
     public String getName() {
         return name;
-    }
-
-    public Stream<Parameter> parameters() {
-        return parameters.stream();
     }
 
     public boolean allowsBodyLines() {
@@ -152,85 +114,29 @@ public class MethodDefinition extends JavaDomNode {
     }
 
     private boolean isBodyAllowedInClass() {
-        if (modifierSet == null) {
-            return true;
-        }
-        
-        return !(modifierSet.isAbstract() || modifierSet.isNative());
+        return !(getModifierSet().isAbstract() || getModifierSet().isNative());
     }
 
     private boolean isBodyAllowedInInterface() {
-        if (modifierSet == null) {
-            return false;
-        }
-        
-        return modifierSet.isDefault() || modifierSet.isStatic();
+        return getModifierSet().isDefault() || getModifierSet().isStatic();
     }
 
-    public Stream<String> bodyLines() {
-        return bodyLines.stream();
-    }
-
-    public static class Builder {
+    public static class Builder extends AbstractMethodDefinitionBuilder<Builder> {
         private MethodDefinition methodDefinition = new MethodDefinition();
         
-        public Builder(String name) {
+        public Builder(String returnType, String name) {
+            methodDefinition.returnType = returnType;
             methodDefinition.name = name;
         }
-        
-        public Builder withJavaDoc(JavaDoc javaDoc) {
-            javaDoc.parent = methodDefinition;
-            methodDefinition.javaDoc = javaDoc;
-            return this;
-        }
 
-        public Builder withModifier(JavaModifier javaModifier) {
-            methodDefinition.getModifierSet().orElseGet(() -> {
-                ModifierSet ms = new ModifierSet(methodDefinition);
-                methodDefinition.modifierSet = ms;
-                return ms;
-            }).javaModifiers.add(javaModifier);
-            
-            return this;
-        }
-
-        public Builder withReturnType(String returnType) {
-            methodDefinition.returnType = returnType;
+        @Override
+        public Builder getThis() {
             return this;
         }
         
-        public Builder withException(String exception) {
-            methodDefinition.exceptions.add(exception);
-            return this;
-        }
-        
-        public Builder withExceptions(Stream<String> exceptions) {
-            exceptions.forEach(methodDefinition.exceptions::add);
-            return this;
-        }
-        
-        public Builder withParameter(Parameter parameter) {
-            parameter.parent = methodDefinition;
-            methodDefinition.parameters.add(parameter);
-            return this;
-        }
-        
-        public Builder withParameters(Stream<Parameter> parameters) {
-            parameters.forEach(parameter -> {
-                parameter.parent = methodDefinition;
-                methodDefinition.parameters.add(parameter);
-            });
-            return this;
-        }
-
-        public Builder withBodyLine(String bodyLine) {
-            methodDefinition.bodyLines.add(bodyLine);
-            return this;
-        }
-
-        public Builder withBodyLines(Stream<String> bodyLines) {
-            bodyLines.forEach(methodDefinition.bodyLines::add);
-            return this;
+        @Override
+        public MethodDefinition getMethod() {
+            return methodDefinition;
         }
         
         public MethodDefinition build() {
