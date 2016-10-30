@@ -1,6 +1,6 @@
 package org.mybatis.generator2.dom.java;
 
-public class Argument extends JavaDomNode {
+public class Argument extends JavaDomNode<Argument> {
     private String value;
     private boolean isString;
 
@@ -21,6 +21,12 @@ public class Argument extends JavaDomNode {
     @Override
     public boolean allowsModifier(JavaModifier javaModifier) {
         return false;
+    }
+    
+    @Override
+    public Argument deepCopy() {
+        // all fields are immutable, no need to make a copy
+        return this;
     }
 
     public String getValue() {

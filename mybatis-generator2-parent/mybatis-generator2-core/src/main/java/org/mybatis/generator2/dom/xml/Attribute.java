@@ -15,7 +15,7 @@
  */
 package org.mybatis.generator2.dom.xml;
 
-public class Attribute extends XmlDomNode implements Comparable<Attribute>{
+public class Attribute extends XmlDomNode<Attribute> implements Comparable<Attribute>{
     
     private String name;
     private String value;
@@ -72,6 +72,12 @@ public class Attribute extends XmlDomNode implements Comparable<Attribute>{
         Attribute other = (Attribute) obj;
         return compareString(this.name, other.name) == 0 &&
                 compareString(this.value, other.value) == 0;
+    }
+    
+    @Override
+    public Attribute deepCopy() {
+        // no need to make a new copy as all fields are immutable
+        return this;
     }
 
     private int compareString(String s1, String s2) {

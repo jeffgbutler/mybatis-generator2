@@ -15,9 +15,14 @@ public class DefaultXmlRendererTest {
     @Test
     public void testFullDocument() {
         Document document = DocumentTest.setupDocument();
+        
         DefaultXmlRenderer renderer = DefaultXmlRenderer.of(document);
         String content = renderer.render();
-        
+        assertThat(content, matchesResourceFile("/org/mybatis/generator2/dom/xml/FullDocument.xml"));
+
+        Document d2 = document.deepCopy();
+        renderer = DefaultXmlRenderer.of(d2);
+        content = renderer.render();
         assertThat(content, matchesResourceFile("/org/mybatis/generator2/dom/xml/FullDocument.xml"));
     }
 
@@ -26,9 +31,14 @@ public class DefaultXmlRendererTest {
         XmlElement rootElement = XmlElement.of("root");
         rootElement = rootElement.withAttribute(Attribute.of("foo", "bar"));
         Document document = Document.of(rootElement);
+
         DefaultXmlRenderer renderer = DefaultXmlRenderer.of(document);
         String content = renderer.render();
+        assertThat(content, matchesResourceFile("/org/mybatis/generator2/dom/xml/EmptyDocument.xml"));
         
+        Document d2 = document.deepCopy();
+        renderer = DefaultXmlRenderer.of(d2);
+        content = renderer.render();
         assertThat(content, matchesResourceFile("/org/mybatis/generator2/dom/xml/EmptyDocument.xml"));
     }
 }

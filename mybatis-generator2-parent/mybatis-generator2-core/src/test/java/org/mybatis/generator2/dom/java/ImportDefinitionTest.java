@@ -2,7 +2,11 @@ package org.mybatis.generator2.dom.java;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+
+import java.util.Arrays;
+
 import org.junit.Test;
+import org.mybatis.generator2.dom.java.JavaDomNode.JavaNodeType;
 
 public class ImportDefinitionTest {
 
@@ -18,24 +22,40 @@ public class ImportDefinitionTest {
     public void testToString1() {
         ImportDefinition importDefinition = ImportDefinition.of("java.math.BigDecimal");
         assertThat(importDefinition.toString(), is("import java.math.BigDecimal;"));
+        assertThat(importDefinition.isStatic(), is(false));
+        assertThat(importDefinition.isNonStatic(), is(true));
+        assertThat(importDefinition.isWildcard(), is(false));
+        assertThat(importDefinition.getNodeType(), is(JavaNodeType.IMPORT));
+        Arrays.stream(JavaModifier.values()).forEach(m -> {
+            assertThat(importDefinition.allowsModifier(m), is(false));
+        });
     }
 
     @Test
     public void testToString2() {
         ImportDefinition importDefinition = ImportDefinition.of("org.junit.Assert", true, true);
         assertThat(importDefinition.toString(), is("import static org.junit.Assert.*;"));
+        assertThat(importDefinition.isStatic(), is(true));
+        assertThat(importDefinition.isNonStatic(), is(false));
+        assertThat(importDefinition.isWildcard(), is(true));
     }
 
     @Test
     public void testToString3() {
         ImportDefinition importDefinition = ImportDefinition.of("org.junit.Assert.assertThat", true, false);
         assertThat(importDefinition.toString(), is("import static org.junit.Assert.assertThat;"));
+        assertThat(importDefinition.isStatic(), is(true));
+        assertThat(importDefinition.isNonStatic(), is(false));
+        assertThat(importDefinition.isWildcard(), is(false));
     }
 
     @Test
     public void testToString4() {
         ImportDefinition importDefinition = ImportDefinition.of("java.util", false, true);
         assertThat(importDefinition.toString(), is("import java.util.*;"));
+        assertThat(importDefinition.isStatic(), is(false));
+        assertThat(importDefinition.isNonStatic(), is(true));
+        assertThat(importDefinition.isWildcard(), is(true));
     }
 
     @Test

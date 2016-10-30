@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class JavaDoc extends JavaDomNode {
+public class JavaDoc extends JavaDomNode<JavaDoc> {
 
     private List<String> javaDocLines = new ArrayList<>();
     
@@ -25,6 +25,13 @@ public class JavaDoc extends JavaDomNode {
     @Override
     public boolean allowsModifier(JavaModifier javaModifier) {
         return false;
+    }
+    
+    @Override
+    public JavaDoc deepCopy() {
+        return new Builder()
+                .withJavaDocLines(javaDocLines())
+                .build();
     }
 
     public Stream<String> javaDocLines() {

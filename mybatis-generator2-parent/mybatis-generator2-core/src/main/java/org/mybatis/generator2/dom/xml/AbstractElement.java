@@ -18,5 +18,7 @@ package org.mybatis.generator2.dom.xml;
 /**
  * @author Jeff Butler
  */
-public abstract class AbstractElement extends XmlDomNode {
+public abstract class AbstractElement<T extends AbstractElement<T>> extends XmlDomNode<T> {
+    @Override
+    public abstract T deepCopy();
 }

@@ -1,11 +1,14 @@
 package org.mybatis.generator2.dom.java;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Stream;
 
-public class FieldDefinition extends JavaDomNode {
+public class FieldDefinition extends JavaDomNode<FieldDefinition> {
 
     private JavaDoc javaDoc;
-    private ModifierSet modifierSet = new ModifierSet(this);
+    private Set<JavaModifier> modifiers = new HashSet<>();
     private String type;
     private String name;
     private String initializationString;
@@ -66,16 +69,26 @@ public class FieldDefinition extends JavaDomNode {
     }
 
     private boolean isModifierAllowedForInterfaceField(JavaModifier javaModifier) {
-        // interface fields are implicitly public, static, final.  No need to specify that.
+        // interface fields are implicitly public, static, final.  No need to specify that,
+        // and no other modifiers allowed
         return false;
     }
 
+    @Override
+    public FieldDefinition deepCopy() {
+        return new Builder(type, name)
+                .withInitializationString(initializationString)
+                .withModifiers(modifiers.stream())
+                .withJavaDoc(javaDoc == null ? null : javaDoc.deepCopy())
+                .build();
+    }
+    
     public Optional<JavaDoc> getJavaDoc() {
         return Optional.ofNullable(javaDoc);
     }
     
     public ModifierSet getModifierSet() {
-        return modifierSet;
+        return new ModifierSet(this, modifiers);
     }
 
     public String getType() {
@@ -104,7 +117,12 @@ public class FieldDefinition extends JavaDomNode {
         }
         
         public Builder withModifier(JavaModifier javaModifier) {
-            fieldDefinition.getModifierSet().addJavaModifier(javaModifier);
+            fieldDefinition.modifiers.add(javaModifier);
+            return this;
+        }
+        
+        public Builder withModifiers(Stream<JavaModifier> javaModifiers) {
+            javaModifiers.forEach(fieldDefinition.modifiers::add);
             return this;
         }
         

@@ -34,7 +34,7 @@ public enum JavaModifier {
      *    contains this modifier (could be a method, parameter, field, class, enum, interface, etc.)
      * @return true if the modifier can be applied to the parent node
      */
-    public boolean isApplicable(JavaDomNode modifiersParent) {
+    public boolean isApplicable(JavaDomNode<?> modifiersParent) {
         return modifiersParent.allowsModifier(this);
     }
 }

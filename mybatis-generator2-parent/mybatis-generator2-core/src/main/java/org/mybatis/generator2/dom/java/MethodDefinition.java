@@ -6,7 +6,7 @@ import java.util.Optional;
  * @author Jeff Butler
  *
  */
-public class MethodDefinition extends AbstractMethodDefinition {
+public class MethodDefinition extends AbstractMethodDefinition<MethodDefinition> {
 
     private String returnType;
     private String name;
@@ -85,6 +85,17 @@ public class MethodDefinition extends AbstractMethodDefinition {
         return rc;
     }
 
+    @Override
+    public MethodDefinition deepCopy() {
+        return new Builder(returnType, name)
+                .withJavaDoc(javaDoc == null ? null : javaDoc.deepCopy())
+                .withModifiers(modifiers.stream())
+                .withParameters(parameters().map(Parameter::deepCopy))
+                .withBodyLines(bodyLines())
+                .withExceptions(exceptions())
+                .build();
+    }
+    
     public Optional<String> getReturnType() {
         return Optional.ofNullable(returnType);
     }
@@ -121,7 +132,7 @@ public class MethodDefinition extends AbstractMethodDefinition {
         return getModifierSet().isDefault() || getModifierSet().isStatic();
     }
 
-    public static class Builder extends AbstractMethodDefinitionBuilder<Builder> {
+    public static class Builder extends AbstractMethodDefinitionBuilder<Builder, MethodDefinition> {
         private MethodDefinition methodDefinition = new MethodDefinition();
         
         public Builder(String returnType, String name) {

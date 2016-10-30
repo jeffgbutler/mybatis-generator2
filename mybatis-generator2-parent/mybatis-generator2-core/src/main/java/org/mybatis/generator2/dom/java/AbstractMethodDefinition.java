@@ -1,18 +1,20 @@
 package org.mybatis.generator2.dom.java;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 /**
  * @author Jeff Butler
  *
  */
-public abstract class AbstractMethodDefinition extends JavaDomNode {
+public abstract class AbstractMethodDefinition<T> extends JavaDomNode<T> {
 
-    private JavaDoc javaDoc;
-    private ModifierSet modifierSet = new ModifierSet(this);
+    protected JavaDoc javaDoc;
+    protected Set<JavaModifier> modifiers = new HashSet<>();
     private List<Parameter> parameters = new ArrayList<>();
     private List<String> bodyLines = new ArrayList<>();
     private List<String> exceptions = new ArrayList<>();
@@ -22,7 +24,7 @@ public abstract class AbstractMethodDefinition extends JavaDomNode {
     }
 
     public ModifierSet getModifierSet() {
-        return modifierSet;
+        return new ModifierSet(this, modifiers);
     }
 
     public boolean hasExceptions() {
@@ -41,16 +43,23 @@ public abstract class AbstractMethodDefinition extends JavaDomNode {
         return bodyLines.stream();
     }
 
-    protected abstract static class AbstractMethodDefinitionBuilder<T extends AbstractMethodDefinitionBuilder<T>> {
+    protected abstract static class AbstractMethodDefinitionBuilder<T extends AbstractMethodDefinitionBuilder<T, S>, S extends AbstractMethodDefinition<S>> {
         
         public T withJavaDoc(JavaDoc javaDoc) {
-            javaDoc.parent = getMethod();
+            if (javaDoc != null) {
+                javaDoc.parent = getMethod();
+            }
             getMethod().javaDoc = javaDoc;
             return getThis();
         }
 
         public T withModifier(JavaModifier javaModifier) {
-            getMethod().getModifierSet().addJavaModifier(javaModifier);
+            getMethod().modifiers.add(javaModifier);
+            return getThis();
+        }
+
+        public T withModifiers(Stream<JavaModifier> javaModifiers) {
+            javaModifiers.forEach(getMethod().modifiers::add);
             return getThis();
         }
 
@@ -59,9 +68,22 @@ public abstract class AbstractMethodDefinition extends JavaDomNode {
             return getThis();
         }
         
+        public T withExceptions(Stream<String> exceptions) {
+            exceptions.forEach(getMethod().exceptions::add);
+            return getThis();
+        }
+        
         public T withParameter(Parameter parameter) {
             parameter.parent = getMethod();
             getMethod().parameters.add(parameter);
+            return getThis();
+        }
+        
+        public T withParameters(Stream<Parameter> parameters) {
+            parameters.forEach(parameter -> {
+                parameter.parent = getMethod();
+                getMethod().parameters.add(parameter);
+            });
             return getThis();
         }
         
@@ -76,6 +98,6 @@ public abstract class AbstractMethodDefinition extends JavaDomNode {
         }
 
         protected abstract T getThis();
-        protected abstract AbstractMethodDefinition getMethod();
+        protected abstract AbstractMethodDefinition<S> getMethod();
     }
 }

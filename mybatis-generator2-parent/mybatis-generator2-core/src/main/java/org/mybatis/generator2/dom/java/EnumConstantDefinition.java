@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class EnumConstantDefinition extends JavaDomNode {
+public class EnumConstantDefinition extends JavaDomNode<EnumConstantDefinition> {
 
     private JavaDoc javaDoc;
     private String name;
@@ -31,6 +31,13 @@ public class EnumConstantDefinition extends JavaDomNode {
         return false;
     }
     
+    @Override
+    public EnumConstantDefinition deepCopy() {
+        return EnumConstantDefinition.of(name,
+                javaDoc == null ? null : javaDoc.deepCopy(),
+                arguments().map(Argument::deepCopy));
+    }
+    
     public String getName() {
         return name;
     }
@@ -52,6 +59,10 @@ public class EnumConstantDefinition extends JavaDomNode {
     }
 
     public static EnumConstantDefinition of(String name, JavaDoc javaDoc, Argument...arguments) {
+        return of(name, javaDoc, Arrays.stream(arguments));
+    }
+
+    public static EnumConstantDefinition of(String name, JavaDoc javaDoc, Stream<Argument> arguments) {
         EnumConstantDefinition enumConstantDefinition = new EnumConstantDefinition();
         enumConstantDefinition.name = name;
         if (javaDoc != null) {
@@ -59,7 +70,7 @@ public class EnumConstantDefinition extends JavaDomNode {
             enumConstantDefinition.javaDoc = javaDoc;
         }
         
-        Arrays.stream(arguments).forEach(a -> {
+        arguments.forEach(a -> {
             a.parent = enumConstantDefinition;
             enumConstantDefinition.arguments.add(a);
         });

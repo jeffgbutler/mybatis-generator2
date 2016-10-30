@@ -15,7 +15,7 @@
  */
 package org.mybatis.generator2.dom.xml;
 
-public class TextElement extends AbstractElement {
+public class TextElement extends AbstractElement<TextElement> {
     
     private String content;
 
@@ -32,6 +32,12 @@ public class TextElement extends AbstractElement {
         visitor.visit(this);
     }
 
+    @Override
+    public TextElement deepCopy() {
+        // no need to make a new copy as all fields are immutable
+        return this;
+    }
+    
     public static TextElement of(String content) {
         TextElement textElement = new TextElement();
         textElement.content = content;

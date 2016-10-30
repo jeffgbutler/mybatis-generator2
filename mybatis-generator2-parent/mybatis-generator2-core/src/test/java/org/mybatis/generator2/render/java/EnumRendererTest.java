@@ -54,5 +54,55 @@ public class EnumRendererTest {
         DefaultJavaRenderer renderer = DefaultJavaRenderer.of(cu);
         String output = renderer.render();
         assertThat(output, matchesResourceFile("/org/mybatis/generator2/dom/java/BasicEnum.java"));
+
+        CompilationUnit cu2 = cu.deepCopy();
+        renderer = DefaultJavaRenderer.of(cu2);
+        output = renderer.render();
+        assertThat(output, matchesResourceFile("/org/mybatis/generator2/dom/java/BasicEnum.java"));
+    }
+
+    @Test
+    public void testBasicEnumWithStringValues() {
+        ConstructorDefinition constructor = new ConstructorDefinition.Builder()
+                // the PUBLIC modifier should be ignored for an enum
+                .withModifier(JavaModifier.PUBLIC)
+                .withModifier(JavaModifier.PRIVATE)
+                .withParameter(Parameter.of("String", "value"))
+                .withBodyLine("this.value = value;")
+                .build();
+        
+        FieldDefinition fd = new FieldDefinition.Builder("String", "value")
+                .withModifier(JavaModifier.PRIVATE)
+                .build();
+        
+        MethodDefinition md = new MethodDefinition.Builder("String", "getValue")
+                .withModifier(JavaModifier.PUBLIC)
+                .withBodyLine("return value;")
+                .build();
+
+        EnumDefinition ed = new EnumDefinition.Builder("BasicEnumWithStrings")
+                .withModifier(JavaModifier.PUBLIC)
+                .withEnumConstant(EnumConstantDefinition.of("FRED", Argument.of("1")))
+                .withEnumConstant(EnumConstantDefinition.of("WILMA", Argument.of("2")))
+                .withEnumConstant(EnumConstantDefinition.of("BARNEY", Argument.of("3")))
+                .withEnumConstant(EnumConstantDefinition.of("BETTY", Argument.of("4")))
+                .withConstructor(constructor)
+                .withMethod(md)
+                .withField(fd)
+                .build();
+        
+        CompilationUnit cu = new CompilationUnit.Builder()
+                .inPackage("org.mybatis.generator.test")
+                .withEnumDefinition(ed)
+                .build();
+
+        DefaultJavaRenderer renderer = DefaultJavaRenderer.of(cu);
+        String output = renderer.render();
+        assertThat(output, matchesResourceFile("/org/mybatis/generator2/dom/java/BasicEnumWithStrings.java"));
+
+        CompilationUnit cu2 = cu.deepCopy();
+        renderer = DefaultJavaRenderer.of(cu2);
+        output = renderer.render();
+        assertThat(output, matchesResourceFile("/org/mybatis/generator2/dom/java/BasicEnumWithStrings.java"));
     }
 }

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class ClassDefinition extends AbstractTypeOrEnum {
+public class ClassDefinition extends AbstractTypeOrEnum<ClassDefinition> {
     
     private String superClass;
     private List<ConstructorDefinition> constructorDefinitions = new ArrayList<>();
@@ -65,8 +65,24 @@ public class ClassDefinition extends AbstractTypeOrEnum {
         
         return rc;
     }
+    
+    @Override
+    public ClassDefinition deepCopy() {
+        return new Builder(name)
+                .withJavaDoc(javaDoc == null ? null : javaDoc.deepCopy())
+                .withModifiers(modifiers.stream())
+                .withSuperInterfaces(superInterfaces())
+                .withSuperClass(superClass)
+                .withFields(fields().map(FieldDefinition::deepCopy))
+                .withConstructors(constructors().map(ConstructorDefinition::deepCopy))
+                .withMethods(methods().map(MethodDefinition::deepCopy))
+                .withClassDefinitions(classes().map(ClassDefinition::deepCopy))
+                .withEnumDefinitions(enums().map(EnumDefinition::deepCopy))
+                .withInterfaceDefinitions(interfaces().map(InterfaceDefinition::deepCopy))
+                .build();
+    }
 
-    public static class Builder extends AbstractTypeOrEnumBuilder<Builder> {
+    public static class Builder extends AbstractTypeOrEnumBuilder<Builder, ClassDefinition> {
         private ClassDefinition classDefinition = new ClassDefinition();
         
         public Builder(String name) {

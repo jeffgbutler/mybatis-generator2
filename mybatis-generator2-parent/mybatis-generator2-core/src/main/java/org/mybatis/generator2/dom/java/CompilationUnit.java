@@ -5,10 +5,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public class CompilationUnit extends AbstractJavaElementContainer {
+public class CompilationUnit extends AbstractJavaElementContainer<CompilationUnit> {
 
     private String pakkage;
     private Set<ImportDefinition> importDefinitions = new HashSet<>();
+    private JavaDoc javaDoc;
     
     private CompilationUnit() {
         super();
@@ -24,6 +25,10 @@ public class CompilationUnit extends AbstractJavaElementContainer {
     
     public Optional<String> getPackage() {
         return Optional.ofNullable(pakkage);
+    }
+    
+    public Optional<JavaDoc> getJavaDoc() {
+        return Optional.ofNullable(javaDoc);
     }
 
     @Override
@@ -44,8 +49,20 @@ public class CompilationUnit extends AbstractJavaElementContainer {
     public boolean allowsModifier(JavaModifier javaModifier) {
         return false;
     }
+    
+    @Override
+    public CompilationUnit deepCopy() {
+        return new Builder()
+                .inPackage(pakkage)
+                .withJavaDoc(javaDoc == null ? null : javaDoc.deepCopy())
+                .withImports(importDefinitions.stream().map(ImportDefinition::deepCopy))
+                .withClassDefinitions(classes().map(ClassDefinition::deepCopy))
+                .withEnumDefinitions(enums().map(EnumDefinition::deepCopy))
+                .withInterfaceDefinitions(interfaces().map(InterfaceDefinition::deepCopy))
+                .build();
+    }
 
-    public static class Builder extends AbstractJavaElementContainerBuilder<Builder> {
+    public static class Builder extends AbstractJavaElementContainerBuilder<Builder, CompilationUnit> {
         private CompilationUnit compilationUnit = new CompilationUnit();
         
         public Builder inPackage(String pakkage) {
@@ -77,6 +94,11 @@ public class CompilationUnit extends AbstractJavaElementContainer {
                 importDefinition.parent = compilationUnit;
                 compilationUnit.importDefinitions.add(importDefinition);
             });
+            return this;
+        }
+        
+        public Builder withJavaDoc(JavaDoc javaDoc) {
+            compilationUnit.javaDoc = javaDoc;
             return this;
         }
 

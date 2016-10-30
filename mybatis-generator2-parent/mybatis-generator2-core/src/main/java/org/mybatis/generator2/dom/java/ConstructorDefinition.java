@@ -6,7 +6,7 @@ package org.mybatis.generator2.dom.java;
  * @author Jeff Butler
  *
  */
-public class ConstructorDefinition extends AbstractMethodDefinition {
+public class ConstructorDefinition extends AbstractMethodDefinition<ConstructorDefinition> {
 
     private ConstructorDefinition() {
         super();
@@ -60,8 +60,19 @@ public class ConstructorDefinition extends AbstractMethodDefinition {
     private boolean isModifierAllowedForEnumConstructor(JavaModifier javaModifier) {
         return javaModifier == JavaModifier.PRIVATE;
     }
+    
+    @Override
+    public ConstructorDefinition deepCopy() {
+        return new Builder()
+                .withJavaDoc(javaDoc == null ? null : javaDoc.deepCopy())
+                .withModifiers(modifiers.stream())
+                .withParameters(parameters().map(Parameter::deepCopy))
+                .withBodyLines(bodyLines())
+                .withExceptions(exceptions())
+                .build();
+    }
 
-    public static class Builder extends AbstractMethodDefinitionBuilder<Builder> {
+    public static class Builder extends AbstractMethodDefinitionBuilder<Builder, ConstructorDefinition> {
         private ConstructorDefinition constructorDefinition = new ConstructorDefinition();
         
         public ConstructorDefinition build() {
@@ -74,7 +85,7 @@ public class ConstructorDefinition extends AbstractMethodDefinition {
         }
 
         @Override
-        public AbstractMethodDefinition getMethod() {
+        public ConstructorDefinition getMethod() {
             return constructorDefinition;
         }
     }

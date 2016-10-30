@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class EnumDefinition extends AbstractTypeOrEnum {
+public class EnumDefinition extends AbstractTypeOrEnum<EnumDefinition> {
 
     private List<EnumConstantDefinition> enumConstantDefinitions = new ArrayList<>();
     private List<ConstructorDefinition> constructorDefinitions = new ArrayList<>();
@@ -56,7 +56,23 @@ public class EnumDefinition extends AbstractTypeOrEnum {
         return rc;
     }
 
-    public static class Builder extends AbstractTypeOrEnumBuilder<Builder> {
+    @Override
+    public EnumDefinition deepCopy() {
+        return new Builder(name)
+                .withJavaDoc(javaDoc == null ? null : javaDoc.deepCopy())
+                .withModifiers(modifiers.stream())
+                .withSuperInterfaces(superInterfaces())
+                .withEnumConstants(enumConstants().map(EnumConstantDefinition::deepCopy))
+                .withFields(fields().map(FieldDefinition::deepCopy))
+                .withConstructors(constructors().map(ConstructorDefinition::deepCopy))
+                .withMethods(methods().map(MethodDefinition::deepCopy))
+                .withClassDefinitions(classes().map(ClassDefinition::deepCopy))
+                .withEnumDefinitions(enums().map(EnumDefinition::deepCopy))
+                .withInterfaceDefinitions(interfaces().map(InterfaceDefinition::deepCopy))
+                .build();
+    }
+    
+    public static class Builder extends AbstractTypeOrEnumBuilder<Builder, EnumDefinition> {
         private EnumDefinition enumDefinition = new EnumDefinition();
         
         public Builder(String name) {

@@ -1,55 +1,53 @@
 package org.mybatis.generator2.dom.java;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public class ModifierSet extends JavaDomNode {
+/**
+ * This isn't a true DOM node, really just a container.  But is does
+ * have some of the characteristics of a DOM node in that it has a parent
+ * and can accept a visitor.
+ * 
+ * @author Jeff Butler
+ *
+ */
+public class ModifierSet {
 
-    private Set<JavaModifier> javaModifiers = new HashSet<>();
+    private Set<JavaModifier> modifiers;
+    private JavaDomNode<?> parent;
     
-    ModifierSet(JavaDomNode parent) {
+    ModifierSet(JavaDomNode<?> parent, Set<JavaModifier> modifiers) {
         super();
         this.parent = parent;
+        this.modifiers = modifiers;
     }
 
-    void addJavaModifier(JavaModifier javaModifier) {
-        javaModifiers.add(javaModifier);
+    public JavaDomNode<?> getParent() {
+        return parent;
     }
     
-    @Override
     public void accept(JavaDomVisitor visitor) {
         visitor.visit(this);
     }
 
-    @Override
-    public JavaNodeType getNodeType() {
-        return JavaNodeType.MODIFIERS;
-    }
-    
-    @Override
-    public boolean allowsModifier(JavaModifier javaModifier) {
-        return false;
-    }
-
     public boolean isDefault() {
-        return javaModifiers.contains(JavaModifier.DEFAULT);
+        return modifiers.contains(JavaModifier.DEFAULT);
     }
     
     public boolean isStatic() {
-        return javaModifiers.contains(JavaModifier.STATIC);
+        return modifiers.contains(JavaModifier.STATIC);
     }
     
     public boolean isAbstract() {
-        return javaModifiers.contains(JavaModifier.ABSTRACT);
+        return modifiers.contains(JavaModifier.ABSTRACT);
     }
     
     public boolean isNative() {
-        return javaModifiers.contains(JavaModifier.NATIVE);
+        return modifiers.contains(JavaModifier.NATIVE);
     }
     
     public boolean isFinal() {
-        return javaModifiers.contains(JavaModifier.FINAL);
+        return modifiers.contains(JavaModifier.FINAL);
     }
     
     /**
@@ -57,6 +55,6 @@ public class ModifierSet extends JavaDomNode {
      * @return
      */
     public Stream<JavaModifier> javaModifiers() {
-        return javaModifiers.stream().sorted();
+        return modifiers.stream().sorted();
     }
 }

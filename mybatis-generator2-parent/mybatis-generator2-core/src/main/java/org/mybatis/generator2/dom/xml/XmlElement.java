@@ -22,10 +22,10 @@ import java.util.stream.Stream;
 /**
  * @author Jeff Butler
  */
-public class XmlElement extends AbstractElement {
+public class XmlElement extends AbstractElement<XmlElement> {
     
     private List<Attribute> attributes = new ArrayList<>();
-    private List<AbstractElement> children = new ArrayList<>();
+    private List<AbstractElement<?>> children = new ArrayList<>();
     private String name;
 
     private XmlElement() {
@@ -36,7 +36,7 @@ public class XmlElement extends AbstractElement {
         return attributes.stream();
     }
 
-    public Stream<AbstractElement> children() {
+    public Stream<AbstractElement<?>> children() {
         return children.stream();
     }
 
@@ -57,7 +57,7 @@ public class XmlElement extends AbstractElement {
                 .build();
     }
     
-    public XmlElement withChild(AbstractElement child) {
+    public XmlElement withChild(AbstractElement<?> child) {
         return new Builder()
                 .withAttributes(attributes())
                 .withChildren(children())
@@ -72,6 +72,15 @@ public class XmlElement extends AbstractElement {
             attributes.stream().forEach(a -> a.accept(visitor));
             children.stream().forEach(e -> e.accept(visitor));
         }
+    }
+    
+    @Override
+    public XmlElement deepCopy() {
+        return new Builder()
+                .withName(name)
+                .withAttributes(attributes().map(Attribute::deepCopy))
+                .withChildren(children().map(AbstractElement::deepCopy))
+                .build();
     }
 
     public static XmlElement of(String name) {
@@ -102,7 +111,7 @@ public class XmlElement extends AbstractElement {
             return this;
         }
 
-        public Builder withChildren(Stream<AbstractElement> children) {
+        public Builder withChildren(Stream<AbstractElement<?>> children) {
             children.forEach(c -> {
                 c.parent = xmlElement;
                 xmlElement.children.add(c);
@@ -110,7 +119,7 @@ public class XmlElement extends AbstractElement {
             return this;
         }
 
-        public Builder withChild(AbstractElement child) {
+        public Builder withChild(AbstractElement<?> child) {
             child.parent = xmlElement;
             xmlElement.children.add(child);
             return this;

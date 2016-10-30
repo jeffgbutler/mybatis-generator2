@@ -1,6 +1,6 @@
 package org.mybatis.generator2.dom.java;
 
-public abstract class JavaDomNode {
+public abstract class JavaDomNode<T> {
     public enum JavaNodeType {
         ARGUMENT,
         CLASS,
@@ -13,15 +13,16 @@ public abstract class JavaDomNode {
         INTERFACE,
         JAVADOC,
         METHOD,
-        MODIFIERS,
         PARAMETER;
     }
     
-    JavaDomNode parent;
+    JavaDomNode<?> parent;
 
-    public JavaDomNode getParent() {
+    public JavaDomNode<?> getParent() {
         return parent;
     }
+    
+    public abstract T deepCopy();
     
     public abstract void accept(JavaDomVisitor visitor);
     public abstract JavaNodeType getNodeType();

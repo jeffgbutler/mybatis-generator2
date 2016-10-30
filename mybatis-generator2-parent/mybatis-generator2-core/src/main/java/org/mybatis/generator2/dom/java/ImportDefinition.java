@@ -1,6 +1,6 @@
 package org.mybatis.generator2.dom.java;
 
-public class ImportDefinition extends JavaDomNode implements Comparable<ImportDefinition> {
+public class ImportDefinition extends JavaDomNode<ImportDefinition> implements Comparable<ImportDefinition> {
     private String typeName;
     private boolean isStatic;
     private boolean isWildcard;
@@ -22,6 +22,12 @@ public class ImportDefinition extends JavaDomNode implements Comparable<ImportDe
     @Override
     public boolean allowsModifier(JavaModifier javaModifier) {
         return false;
+    }
+    
+    @Override
+    public ImportDefinition deepCopy() {
+        // all fields are immutable, no need to make a copy
+        return this;
     }
 
     public String getTypeName() {

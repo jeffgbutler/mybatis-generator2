@@ -11,6 +11,7 @@ import org.mybatis.generator2.dom.java.ConstructorDefinition;
 import org.mybatis.generator2.dom.java.EnumConstantDefinition;
 import org.mybatis.generator2.dom.java.EnumDefinition;
 import org.mybatis.generator2.dom.java.FieldDefinition;
+import org.mybatis.generator2.dom.java.ImportDefinition;
 import org.mybatis.generator2.dom.java.InterfaceDefinition;
 import org.mybatis.generator2.dom.java.JavaDoc;
 import org.mybatis.generator2.dom.java.JavaDomNode.JavaNodeType;
@@ -66,21 +67,21 @@ public class DefaultJavaRenderer {
                 newLine(buffer);
             }
             
-            compilationUnit.staticImports().forEach(i -> {
-                buffer.append(i.toString());
-                newLine(buffer);
-            });
+            compilationUnit.staticImports().forEach(i -> i.accept(this));
             
             if (compilationUnit.nonStaticImports().count() > 0) {
                 newLine(buffer);
             }
 
-            compilationUnit.nonStaticImports().forEach(i -> {
-                buffer.append(i.toString());
-                newLine(buffer);
-            });
+            compilationUnit.nonStaticImports().forEach(i -> i.accept(this));
             
             return true;
+        }
+
+        @Override
+        public void visit(ImportDefinition importDefinition) {
+            buffer.append(importDefinition.toString());
+            newLine(buffer);
         }
         
         @Override
@@ -193,7 +194,7 @@ public class DefaultJavaRenderer {
             newLine(buffer);
         }
 
-        private void addSuperInterfaces(AbstractTypeOrEnum type) {
+        private void addSuperInterfaces(AbstractTypeOrEnum<?> type) {
             String prefix = type.getNodeType() == JavaNodeType.INTERFACE ? "extends " : "implements ";
             if (type.hasSuperInterfaces()) {
                 buffer.append(type.superInterfaces()
@@ -281,14 +282,14 @@ public class DefaultJavaRenderer {
             constructorDefinition.getJavaDoc().ifPresent(j -> j.accept(this));
             javaIndent(buffer, indentLevel);
             constructorDefinition.getModifierSet().accept(this);
-            buffer.append(((AbstractTypeOrEnum) constructorDefinition.getParent()).getName());
+            buffer.append(((AbstractTypeOrEnum<?>) constructorDefinition.getParent()).getName());
             
             addMethodParameters(constructorDefinition);
             addMethodExceptions(constructorDefinition);
             addMethodBody(constructorDefinition);
         }
 
-        private void addMethodParameters(AbstractMethodDefinition method) {
+        private void addMethodParameters(AbstractMethodDefinition<?> method) {
             buffer.append('(');
             method.parameters().limit(1).forEach(p -> p.accept(this));
             method.parameters().skip(1).forEach(p -> {
@@ -298,14 +299,14 @@ public class DefaultJavaRenderer {
             buffer.append(")");
         }
         
-        private void addMethodExceptions(AbstractMethodDefinition method) {
+        private void addMethodExceptions(AbstractMethodDefinition<?> method) {
             if (method.hasExceptions()) {
                 buffer.append(method.exceptions()
                         .collect(Collectors.joining(", ", " throws ", "")));
             }
         }
         
-        private void addMethodBody(AbstractMethodDefinition method) {
+        private void addMethodBody(AbstractMethodDefinition<?> method) {
             buffer.append(" {");
             newLine(buffer);
             

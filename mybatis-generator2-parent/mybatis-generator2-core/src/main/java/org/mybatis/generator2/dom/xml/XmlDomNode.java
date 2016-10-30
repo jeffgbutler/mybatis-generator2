@@ -1,12 +1,14 @@
 package org.mybatis.generator2.dom.xml;
 
-public abstract class XmlDomNode {
+public abstract class XmlDomNode<T> {
 
-    XmlDomNode parent;
+    XmlDomNode<?> parent;
     
-    public XmlDomNode getParent() {
+    public XmlDomNode<?> getParent() {
         return parent;
     }
+    
+    public abstract T deepCopy();
     
     public abstract void accept(XmlDomVisitor visitor);
 }

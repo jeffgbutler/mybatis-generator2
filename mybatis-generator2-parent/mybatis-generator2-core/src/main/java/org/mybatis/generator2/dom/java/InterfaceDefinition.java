@@ -1,6 +1,6 @@
 package org.mybatis.generator2.dom.java;
 
-public class InterfaceDefinition extends AbstractTypeOrEnum {
+public class InterfaceDefinition extends AbstractTypeOrEnum<InterfaceDefinition> {
 
     private InterfaceDefinition() {
         super();
@@ -50,7 +50,21 @@ public class InterfaceDefinition extends AbstractTypeOrEnum {
         return rc;
     }
 
-    public static class Builder extends AbstractTypeOrEnumBuilder<Builder> {
+    @Override
+    public InterfaceDefinition deepCopy() {
+        return new Builder(name)
+                .withJavaDoc(javaDoc == null ? null : javaDoc.deepCopy())
+                .withModifiers(modifiers.stream())
+                .withSuperInterfaces(superInterfaces())
+                .withFields(fields().map(FieldDefinition::deepCopy))
+                .withMethods(methods().map(MethodDefinition::deepCopy))
+                .withClassDefinitions(classes().map(ClassDefinition::deepCopy))
+                .withEnumDefinitions(enums().map(EnumDefinition::deepCopy))
+                .withInterfaceDefinitions(interfaces().map(InterfaceDefinition::deepCopy))
+                .build();
+    }
+    
+    public static class Builder extends AbstractTypeOrEnumBuilder<Builder, InterfaceDefinition> {
         private InterfaceDefinition interfaceDefinition = new InterfaceDefinition();
         
         public Builder(String name) {

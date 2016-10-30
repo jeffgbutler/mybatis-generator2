@@ -107,6 +107,11 @@ public class ClassRendererTest {
         DefaultJavaRenderer renderer = DefaultJavaRenderer.of(compilationUnit);
         String output = renderer.render();
         assertThat(output, matchesResourceFile("/org/mybatis/generator2/dom/java/BasicClass.java"));
+        
+        CompilationUnit cu2 = compilationUnit.deepCopy();
+        renderer = DefaultJavaRenderer.of(cu2);
+        output = renderer.render();
+        assertThat(output, matchesResourceFile("/org/mybatis/generator2/dom/java/BasicClass.java"));
     }
 
     @Test

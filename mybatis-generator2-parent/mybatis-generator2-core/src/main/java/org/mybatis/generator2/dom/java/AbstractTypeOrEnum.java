@@ -1,14 +1,16 @@
 package org.mybatis.generator2.dom.java;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
-public abstract class AbstractTypeOrEnum extends AbstractJavaElementContainer {
+public abstract class AbstractTypeOrEnum<T> extends AbstractJavaElementContainer<T> {
 
-    private JavaDoc javaDoc;
-    private ModifierSet modifierSet = new ModifierSet(this);
+    protected JavaDoc javaDoc;
+    protected Set<JavaModifier> modifiers = new HashSet<>();
     String name;
     private List<FieldDefinition> fieldDefinitions = new ArrayList<>();
     private List<MethodDefinition> methodDefinitions = new ArrayList<>();
@@ -19,7 +21,7 @@ public abstract class AbstractTypeOrEnum extends AbstractJavaElementContainer {
     }
     
     public ModifierSet getModifierSet() {
-        return modifierSet;
+        return new ModifierSet(this, modifiers);
     }
     
     public String getName() {
@@ -61,16 +63,23 @@ public abstract class AbstractTypeOrEnum extends AbstractJavaElementContainer {
     
     protected abstract void acceptConstructors(JavaDomVisitor visitor);
     
-    protected abstract static class AbstractTypeOrEnumBuilder<T extends AbstractTypeOrEnumBuilder<T>> extends AbstractJavaElementContainerBuilder<T> {
+    protected abstract static class AbstractTypeOrEnumBuilder<T extends AbstractTypeOrEnumBuilder<T, S>, S extends AbstractTypeOrEnum<S>> extends AbstractJavaElementContainerBuilder<T, S> {
         
         public T withJavaDoc(JavaDoc javaDoc) {
-            javaDoc.parent = getConcreteItem();
+            if (javaDoc != null) {
+                javaDoc.parent = getConcreteItem();
+            }
             getConcreteItem().javaDoc = javaDoc;
             return getThis();
         }
 
         public T withModifier(JavaModifier javaModifier) {
-            getConcreteItem().modifierSet.addJavaModifier(javaModifier);
+            getConcreteItem().modifiers.add(javaModifier);
+            return getThis();
+        }
+        
+        public T withModifiers(Stream<JavaModifier> javaModifiers) {
+            javaModifiers.forEach(getConcreteItem().modifiers::add);
             return getThis();
         }
         
@@ -113,6 +122,6 @@ public abstract class AbstractTypeOrEnum extends AbstractJavaElementContainer {
         }
         
         @Override
-        protected abstract AbstractTypeOrEnum getConcreteItem();
+        protected abstract AbstractTypeOrEnum<S> getConcreteItem();
     }
 }

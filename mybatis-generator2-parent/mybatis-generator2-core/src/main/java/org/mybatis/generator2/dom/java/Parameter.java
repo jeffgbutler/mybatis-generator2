@@ -1,8 +1,12 @@
 package org.mybatis.generator2.dom.java;
 
-public class Parameter extends JavaDomNode {
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Stream;
 
-    private ModifierSet modifierSet = new ModifierSet(this);
+public class Parameter extends JavaDomNode<Parameter> {
+
+    private Set<JavaModifier> modifiers = new HashSet<>();
     private String name;
     private String type;
     private boolean isVarargs;
@@ -12,7 +16,7 @@ public class Parameter extends JavaDomNode {
     }
 
     public ModifierSet getModifierSet() {
-        return modifierSet;
+        return new ModifierSet(this, modifiers);
     }
     
     public String getName() {
@@ -41,6 +45,14 @@ public class Parameter extends JavaDomNode {
     public boolean allowsModifier(JavaModifier javaModifier) {
         return javaModifier == JavaModifier.FINAL;
     }
+    
+    @Override
+    public Parameter deepCopy() {
+        return new Builder(type, name)
+                .isVarArgs(isVarargs)
+                .withModifiers(modifiers.stream())
+                .build();
+    }
 
     public static Parameter of(String type, String name) {
         return new Builder(type, name).build();
@@ -55,10 +67,15 @@ public class Parameter extends JavaDomNode {
         }
 
         public Builder withModifier(JavaModifier javaModifier) {
-            parameter.getModifierSet().addJavaModifier(javaModifier);
+            parameter.modifiers.add(javaModifier);
             return this;
         }
         
+        public Builder withModifiers(Stream<JavaModifier> javaModifiers) {
+            javaModifiers.forEach(parameter.modifiers::add);
+            return this;
+        }
+
         public Builder isVarArgs(boolean isVarArgs) {
             parameter.isVarargs = isVarArgs;
             return this;

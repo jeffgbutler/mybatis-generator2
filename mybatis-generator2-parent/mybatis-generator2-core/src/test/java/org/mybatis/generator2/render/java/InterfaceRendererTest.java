@@ -61,5 +61,10 @@ public class InterfaceRendererTest {
         DefaultJavaRenderer renderer = DefaultJavaRenderer.of(cu);
         String output = renderer.render();
         assertThat(output, matchesResourceFile("/org/mybatis/generator2/dom/java/BasicInterface.java"));
+
+        CompilationUnit cu2 = cu.deepCopy();
+        renderer = DefaultJavaRenderer.of(cu2);
+        output = renderer.render();
+        assertThat(output, matchesResourceFile("/org/mybatis/generator2/dom/java/BasicInterface.java"));
     }
 }

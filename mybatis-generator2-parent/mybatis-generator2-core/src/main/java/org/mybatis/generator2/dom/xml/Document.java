@@ -18,7 +18,7 @@ package org.mybatis.generator2.dom.xml;
 /**
  * @author Jeff Butler
  */
-public class Document extends XmlDomNode {
+public class Document extends XmlDomNode<Document> {
     
     private String publicId;
     private String systemId;
@@ -45,6 +45,11 @@ public class Document extends XmlDomNode {
         if (visitor.visit(this)) {
             rootElement.accept(visitor);
         }
+    }
+    
+    @Override
+    public Document deepCopy() {
+        return Document.of(publicId, systemId, rootElement.deepCopy());
     }
 
     public static Document of(XmlElement rootElement) {
