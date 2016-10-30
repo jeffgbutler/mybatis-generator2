@@ -12,6 +12,7 @@ import org.mybatis.generator2.dom.java.CompilationUnit;
 import org.mybatis.generator2.dom.java.ConstructorDefinition;
 import org.mybatis.generator2.dom.java.FieldDefinition;
 import org.mybatis.generator2.dom.java.ImportDefinition;
+import org.mybatis.generator2.dom.java.JavaDoc;
 import org.mybatis.generator2.dom.java.JavaModifier;
 import org.mybatis.generator2.dom.java.MethodDefinition;
 import org.mybatis.generator2.dom.java.Parameter;
@@ -68,8 +69,18 @@ public class ClassRendererTest {
         bodyLines.add("");
         bodyLines.add("System.out.println(\"End of method\");");
         
-        MethodDefinition weirdMethod = new MethodDefinition.Builder("void", "weirdMethod")
+        JavaDoc javaDoc = new JavaDoc.Builder()
+                .withJavaDocLine("/**")
+                .withJavaDocLine(" * This is a method that exercises a lot of the renderer")
+                .withJavaDocLine(" * ")
+                .withJavaDocLine(" * @throws Exception")
+                .withJavaDocLine(" */")
+                .build();
+        
+        MethodDefinition weirdMethod = new MethodDefinition.Builder("void", "tortureTestMethod")
                 .withModifier(JavaModifier.PUBLIC)
+                .withException("Exception")
+                .withJavaDoc(javaDoc)
                 .withBodyLines(bodyLines.stream())
                 .build();
         

@@ -31,20 +31,6 @@ public class JavaDoc extends JavaDomNode {
         return javaDocLines.stream();
     }
     
-    public JavaDoc withJavaDocLine(String javaDocLine) {
-        return new Builder()
-                .withJavaDocLines(javaDocLines())
-                .withJavaDocLine(javaDocLine)
-                .build();
-    }
-    
-    public JavaDoc withJavaDocLines(Stream<String> javaDocLines) {
-        return new Builder()
-                .withJavaDocLines(javaDocLines())
-                .withJavaDocLines(javaDocLines)
-                .build();
-    }
-    
     public static JavaDoc of(Stream<String> javaDocLines) {
         return new Builder()
                 .withJavaDocLines(javaDocLines)

@@ -59,25 +59,12 @@ public abstract class AbstractMethodDefinition extends JavaDomNode {
             return getThis();
         }
         
-        public T withExceptions(Stream<String> exceptions) {
-            exceptions.forEach(getMethod().exceptions::add);
-            return getThis();
-        }
-        
         public T withParameter(Parameter parameter) {
             parameter.parent = getMethod();
             getMethod().parameters.add(parameter);
             return getThis();
         }
         
-        public T withParameters(Stream<Parameter> parameters) {
-            parameters.forEach(parameter -> {
-                parameter.parent = getMethod();
-                getMethod().parameters.add(parameter);
-            });
-            return getThis();
-        }
-
         public T withBodyLine(String bodyLine) {
             getMethod().bodyLines.add(bodyLine);
             return getThis();

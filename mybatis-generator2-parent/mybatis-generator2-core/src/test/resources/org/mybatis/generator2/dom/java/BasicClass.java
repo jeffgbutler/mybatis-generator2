@@ -18,7 +18,12 @@ public class BasicClass implements Serializable {
         return a + b;
     }
 
-    public void weirdMethod() {
+    /**
+     * This is a method that exercises a lot of the renderer
+     * 
+     * @throws Exception
+     */
+    public void tortureTestMethod() throws Exception {
         boolean bool = false;
 
         if (bool) {
