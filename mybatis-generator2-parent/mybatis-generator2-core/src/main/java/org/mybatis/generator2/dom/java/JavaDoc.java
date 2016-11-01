@@ -48,7 +48,7 @@ public class JavaDoc extends JavaDomNode<JavaDoc> {
         private JavaDoc javaDoc = new JavaDoc();
         
         public Builder withJavaDocLines(Stream<String> javaDocLines) {
-            javaDocLines.forEach(javaDoc.javaDocLines::add);
+            javaDocLines.forEach(this::withJavaDocLine);
             return this;
         }
         

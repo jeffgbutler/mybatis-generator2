@@ -26,8 +26,7 @@ public class ImportDefinition extends JavaDomNode<ImportDefinition> implements C
     
     @Override
     public ImportDefinition deepCopy() {
-        // all fields are immutable, no need to make a copy
-        return this;
+        return ImportDefinition.of(typeName, isStatic, isWildcard);
     }
 
     public String getTypeName() {

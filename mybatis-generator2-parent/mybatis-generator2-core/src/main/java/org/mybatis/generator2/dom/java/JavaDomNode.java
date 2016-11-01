@@ -23,7 +23,6 @@ public abstract class JavaDomNode<T> {
     }
     
     public abstract T deepCopy();
-    
     public abstract void accept(JavaDomVisitor visitor);
     public abstract JavaNodeType getNodeType();
     public abstract boolean allowsModifier(JavaModifier javaModifier);

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
+import org.mybatis.generator2.dom.java.JavaDomNode.JavaNodeType;
 
 public class EnumConstantDefinitionTest {
 
@@ -31,5 +32,24 @@ public class EnumConstantDefinitionTest {
         assertThat(enumConstantDefinition.getName(), is("FRED"));
         assertThat(enumConstantDefinition.getJavaDoc().isPresent(), is(true));
         assertThat(enumConstantDefinition.getJavaDoc().get().javaDocLines().count(), is(3l));
+    }
+
+    @Test
+    public void testModifierRules() {
+        EnumConstantDefinition enumConstantDefinition = EnumConstantDefinition.of("FRED");
+        assertThat(enumConstantDefinition.getNodeType(), is(JavaNodeType.ENUM_CONSTANT));
+        
+        assertThat(enumConstantDefinition.allowsModifier(JavaModifier.PUBLIC), is(false));
+        assertThat(enumConstantDefinition.allowsModifier(JavaModifier.PROTECTED), is(false));
+        assertThat(enumConstantDefinition.allowsModifier(JavaModifier.PRIVATE), is(false));
+        assertThat(enumConstantDefinition.allowsModifier(JavaModifier.ABSTRACT), is(false));
+        assertThat(enumConstantDefinition.allowsModifier(JavaModifier.DEFAULT), is(false));
+        assertThat(enumConstantDefinition.allowsModifier(JavaModifier.STATIC), is(false));
+        assertThat(enumConstantDefinition.allowsModifier(JavaModifier.FINAL), is(false));
+        assertThat(enumConstantDefinition.allowsModifier(JavaModifier.TRANSIENT), is(false));
+        assertThat(enumConstantDefinition.allowsModifier(JavaModifier.VOLATILE), is(false));
+        assertThat(enumConstantDefinition.allowsModifier(JavaModifier.SYNCHRONIZED), is(false));
+        assertThat(enumConstantDefinition.allowsModifier(JavaModifier.NATIVE), is(false));
+        assertThat(enumConstantDefinition.allowsModifier(JavaModifier.STRICTFP), is(false));
     }
 }

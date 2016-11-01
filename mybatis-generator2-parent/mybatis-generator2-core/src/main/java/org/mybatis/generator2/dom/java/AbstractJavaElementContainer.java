@@ -31,10 +31,7 @@ public abstract class AbstractJavaElementContainer<T> extends JavaDomNode<T> {
         }
         
         public T withClassDefinitions(Stream<ClassDefinition> classDefinitions) {
-            classDefinitions.forEach(classDefinition -> {
-                classDefinition.parent = getConcreteItem();
-                getConcreteItem().classDefinitions.add(classDefinition);
-            });
+            classDefinitions.forEach(this::withClassDefinition);
             return getThis();
         }
         
@@ -45,10 +42,7 @@ public abstract class AbstractJavaElementContainer<T> extends JavaDomNode<T> {
         }
         
         public T withEnumDefinitions(Stream<EnumDefinition> enumDefinitions) {
-            enumDefinitions.forEach(enumDefinition -> {
-                enumDefinition.parent = getConcreteItem();
-                getConcreteItem().enumDefinitions.add(enumDefinition);
-            });
+            enumDefinitions.forEach(this::withEnumDefinition);
             return getThis();
         }
         
@@ -59,10 +53,7 @@ public abstract class AbstractJavaElementContainer<T> extends JavaDomNode<T> {
         }
 
         public T withInterfaceDefinitions(Stream<InterfaceDefinition> interfaceDefinitions) {
-            interfaceDefinitions.forEach(interfaceDefinition -> {
-                interfaceDefinition.parent = getConcreteItem();
-                getConcreteItem().interfaceDefinitions.add(interfaceDefinition);
-            });
+            interfaceDefinitions.forEach(this::withInterfaceDefinition);
             return getThis();
         }
 

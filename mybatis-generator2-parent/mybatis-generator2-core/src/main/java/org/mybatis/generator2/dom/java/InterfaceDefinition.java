@@ -36,11 +36,11 @@ public class InterfaceDefinition extends AbstractTypeOrEnum<InterfaceDefinition>
             
         case PROTECTED:
         case PRIVATE:
-            rc = parent.getNodeType() == JavaNodeType.CLASS;
+            rc = isParentClassOrEnum();
             break;
             
         case STATIC:
-            rc = parent.getNodeType() != JavaNodeType.COMPILATION_UNIT;
+            rc = isParentClassOrEnumOrInterface();
             break;
             
         default:
@@ -48,6 +48,28 @@ public class InterfaceDefinition extends AbstractTypeOrEnum<InterfaceDefinition>
         }
         
         return rc;
+    }
+    
+    private boolean isParentClassOrEnum() {
+        return parent != null &&
+                (isParentClass() || isParentEnum());
+    }
+
+    private boolean isParentClassOrEnumOrInterface() {
+        return parent != null &&
+                (isParentInterface() || isParentClassOrEnum());
+    }
+    
+    private boolean isParentClass() {
+        return parent.getNodeType() == JavaNodeType.CLASS;
+    }
+    
+    private boolean isParentEnum() {
+        return parent.getNodeType() == JavaNodeType.ENUM;
+    }
+    
+    private boolean isParentInterface() {
+        return parent.getNodeType() == JavaNodeType.INTERFACE;
     }
 
     @Override

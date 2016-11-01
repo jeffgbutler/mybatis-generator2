@@ -59,7 +59,7 @@ public abstract class AbstractMethodDefinition<T> extends JavaDomNode<T> {
         }
 
         public T withModifiers(Stream<JavaModifier> javaModifiers) {
-            javaModifiers.forEach(getMethod().modifiers::add);
+            javaModifiers.forEach(this::withModifier);
             return getThis();
         }
 
@@ -69,7 +69,7 @@ public abstract class AbstractMethodDefinition<T> extends JavaDomNode<T> {
         }
         
         public T withExceptions(Stream<String> exceptions) {
-            exceptions.forEach(getMethod().exceptions::add);
+            exceptions.forEach(this::withException);
             return getThis();
         }
         
@@ -80,10 +80,7 @@ public abstract class AbstractMethodDefinition<T> extends JavaDomNode<T> {
         }
         
         public T withParameters(Stream<Parameter> parameters) {
-            parameters.forEach(parameter -> {
-                parameter.parent = getMethod();
-                getMethod().parameters.add(parameter);
-            });
+            parameters.forEach(this::withParameter);
             return getThis();
         }
         
@@ -93,7 +90,7 @@ public abstract class AbstractMethodDefinition<T> extends JavaDomNode<T> {
         }
 
         public T withBodyLines(Stream<String> bodyLines) {
-            bodyLines.forEach(getMethod().bodyLines::add);
+            bodyLines.forEach(this::withBodyLine);
             return getThis();
         }
 

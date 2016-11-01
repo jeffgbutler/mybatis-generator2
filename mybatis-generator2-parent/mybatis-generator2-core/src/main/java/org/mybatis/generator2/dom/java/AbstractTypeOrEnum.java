@@ -79,7 +79,7 @@ public abstract class AbstractTypeOrEnum<T> extends AbstractJavaElementContainer
         }
         
         public T withModifiers(Stream<JavaModifier> javaModifiers) {
-            javaModifiers.forEach(getConcreteItem().modifiers::add);
+            javaModifiers.forEach(this::withModifier);
             return getThis();
         }
         
@@ -90,10 +90,7 @@ public abstract class AbstractTypeOrEnum<T> extends AbstractJavaElementContainer
         }
         
         public T withFields(Stream<FieldDefinition> fields) {
-            fields.forEach(field -> {
-                field.parent = getConcreteItem();
-                getConcreteItem().fieldDefinitions.add(field);
-            });
+            fields.forEach(this::withField);
             return getThis();
         }
 
@@ -104,10 +101,7 @@ public abstract class AbstractTypeOrEnum<T> extends AbstractJavaElementContainer
         }
 
         public T withMethods(Stream<MethodDefinition> methods) {
-            methods.forEach(method -> {
-                method.parent = getConcreteItem();
-                getConcreteItem().methodDefinitions.add(method);
-            });
+            methods.forEach(this::withMethod);
             return getThis();
         }
         
@@ -117,7 +111,7 @@ public abstract class AbstractTypeOrEnum<T> extends AbstractJavaElementContainer
         }
         
         public T withSuperInterfaces(Stream<String> superInterfaces) {
-            superInterfaces.forEach(getConcreteItem().superInterfaces::add);
+            superInterfaces.forEach(this::withSuperInterface);
             return getThis();
         }
         

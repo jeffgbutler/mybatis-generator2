@@ -96,15 +96,13 @@ public class ClassDefinition extends AbstractTypeOrEnum<ClassDefinition> {
 
         public Builder withConstructor(ConstructorDefinition constructor) {
             constructor.parent = classDefinition;
+            constructor.name = classDefinition.name;
             classDefinition.constructorDefinitions.add(constructor);
             return this;
         }
 
         public Builder withConstructors(Stream<ConstructorDefinition> constructors) {
-            constructors.forEach(constructor -> {
-                constructor.parent = classDefinition;
-                classDefinition.constructorDefinitions.add(constructor);
-            });
+            constructors.forEach(this::withConstructor);
             return this;
         }
         

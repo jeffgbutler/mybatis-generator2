@@ -25,8 +25,7 @@ public class Argument extends JavaDomNode<Argument> {
     
     @Override
     public Argument deepCopy() {
-        // all fields are immutable, no need to make a copy
-        return this;
+        return Argument.of(value, isString);
     }
 
     public String getValue() {

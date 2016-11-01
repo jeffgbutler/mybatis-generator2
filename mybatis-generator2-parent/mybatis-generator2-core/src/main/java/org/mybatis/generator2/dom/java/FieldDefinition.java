@@ -29,6 +29,10 @@ public class FieldDefinition extends JavaDomNode<FieldDefinition> {
 
     @Override
     public boolean allowsModifier(JavaModifier javaModifier) {
+        if (parent == null) {
+            return false;
+        }
+        
         boolean rc;
         switch (parent.getNodeType()) {
         case CLASS:
@@ -37,7 +41,9 @@ public class FieldDefinition extends JavaDomNode<FieldDefinition> {
             break;
         
         case INTERFACE:
-            rc = isModifierAllowedForInterfaceField(javaModifier);
+            // interface fields are implicitly public, static, final.  No need to specify that,
+            // and no other modifiers allowed
+            rc = false;
             break;
             
         default:
@@ -66,12 +72,6 @@ public class FieldDefinition extends JavaDomNode<FieldDefinition> {
         }
         
         return rc;
-    }
-
-    private boolean isModifierAllowedForInterfaceField(JavaModifier javaModifier) {
-        // interface fields are implicitly public, static, final.  No need to specify that,
-        // and no other modifiers allowed
-        return false;
     }
 
     @Override
@@ -122,11 +122,14 @@ public class FieldDefinition extends JavaDomNode<FieldDefinition> {
         }
         
         public Builder withModifiers(Stream<JavaModifier> javaModifiers) {
-            javaModifiers.forEach(fieldDefinition.modifiers::add);
+            javaModifiers.forEach(this::withModifier);
             return this;
         }
         
         public Builder withJavaDoc(JavaDoc javaDoc) {
+            if (javaDoc != null) {
+                javaDoc.parent = fieldDefinition;
+            }
             fieldDefinition.javaDoc = javaDoc;
             return this;
         }

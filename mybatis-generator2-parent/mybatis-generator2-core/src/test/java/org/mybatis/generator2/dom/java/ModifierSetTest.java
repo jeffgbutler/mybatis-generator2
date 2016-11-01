@@ -8,7 +8,7 @@ import java.util.Set;
 
 import org.junit.Test;
 
-public class ModifiersTest {
+public class ModifierSetTest {
 
     @Test
     public void testOrdering() {

@@ -72,7 +72,7 @@ public class Parameter extends JavaDomNode<Parameter> {
         }
         
         public Builder withModifiers(Stream<JavaModifier> javaModifiers) {
-            javaModifiers.forEach(parameter.modifiers::add);
+            javaModifiers.forEach(this::withModifier);
             return this;
         }
 

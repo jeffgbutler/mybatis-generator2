@@ -282,7 +282,7 @@ public class DefaultJavaRenderer {
             constructorDefinition.getJavaDoc().ifPresent(j -> j.accept(this));
             javaIndent(buffer, indentLevel);
             constructorDefinition.getModifierSet().accept(this);
-            buffer.append(((AbstractTypeOrEnum<?>) constructorDefinition.getParent()).getName());
+            buffer.append(constructorDefinition.getName());
             
             addMethodParameters(constructorDefinition);
             addMethodExceptions(constructorDefinition);

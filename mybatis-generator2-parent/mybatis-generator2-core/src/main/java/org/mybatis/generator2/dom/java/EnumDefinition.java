@@ -81,15 +81,13 @@ public class EnumDefinition extends AbstractTypeOrEnum<EnumDefinition> {
         
         public Builder withConstructor(ConstructorDefinition constructor) {
             constructor.parent = enumDefinition;
+            constructor.name = enumDefinition.name;
             enumDefinition.constructorDefinitions.add(constructor);
             return this;
         }
 
         public Builder withConstructors(Stream<ConstructorDefinition> constructors) {
-            constructors.forEach(constructor -> {
-                constructor.parent = enumDefinition;
-                enumDefinition.constructorDefinitions.add(constructor);
-            });
+            constructors.forEach(this::withConstructor);
             return this;
         }
 
@@ -100,10 +98,7 @@ public class EnumDefinition extends AbstractTypeOrEnum<EnumDefinition> {
         }
         
         public Builder withEnumConstants(Stream<EnumConstantDefinition> enumConstants) {
-            enumConstants.forEach(enumConstant -> {
-                enumConstant.parent = enumDefinition;
-                enumDefinition.enumConstantDefinitions.add(enumConstant);
-            });
+            enumConstants.forEach(this::withEnumConstant);
             return this;
         }
 

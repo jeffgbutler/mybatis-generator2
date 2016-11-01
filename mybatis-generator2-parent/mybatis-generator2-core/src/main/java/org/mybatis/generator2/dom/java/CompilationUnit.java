@@ -78,9 +78,7 @@ public class CompilationUnit extends AbstractJavaElementContainer<CompilationUni
          */
         public Builder withImport(String importDefinition) {
             ImportDefinition id = ImportDefinition.of(importDefinition);
-            id.parent = compilationUnit;
-            compilationUnit.importDefinitions.add(id);
-            return this;
+            return withImport(id);
         }
 
         public Builder withImport(ImportDefinition importDefinition) {
@@ -90,14 +88,14 @@ public class CompilationUnit extends AbstractJavaElementContainer<CompilationUni
         }
 
         public Builder withImports(Stream<ImportDefinition> imports) {
-            imports.forEach(importDefinition -> {
-                importDefinition.parent = compilationUnit;
-                compilationUnit.importDefinitions.add(importDefinition);
-            });
+            imports.forEach(this::withImport);
             return this;
         }
         
         public Builder withJavaDoc(JavaDoc javaDoc) {
+            if (javaDoc != null) {
+                javaDoc.parent = compilationUnit;
+            }
             compilationUnit.javaDoc = javaDoc;
             return this;
         }
