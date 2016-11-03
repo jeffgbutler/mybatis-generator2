@@ -29,7 +29,11 @@ public class FullTableName {
     
     @Override
     public boolean equals(Object obj) {
-        if (obj == null || !(obj instanceof FullTableName)) {
+        if (obj == null) {
+            return false;
+        }
+        
+        if (!(obj instanceof FullTableName)) {
             return false;
         }
 

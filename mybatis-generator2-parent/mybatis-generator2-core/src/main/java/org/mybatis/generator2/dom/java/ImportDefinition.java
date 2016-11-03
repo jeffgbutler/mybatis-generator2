@@ -77,7 +77,11 @@ public class ImportDefinition extends JavaDomNode<ImportDefinition> implements C
     
     @Override
     public boolean equals(Object other) {
-        if (other == null || !(other instanceof ImportDefinition)) {
+        if (other == null) {
+            return false;
+        }
+        
+        if (!(other instanceof ImportDefinition)) {
             return false;
         }
         

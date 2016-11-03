@@ -78,12 +78,25 @@ public class FullTableNameTest {
     }
 
     @Test
+    public void testHashCode() {
+        FullTableName fullTableName1 = new FullTableName.Builder()
+                .withSchema("schema1")
+                .withTableName("table1")
+                .build();
+        FullTableName fullTableName2 = new FullTableName.Builder()
+                .withSchema("schema1")
+                .withTableName("table1")
+                .build();
+        assertThat(fullTableName1.hashCode(), is(equalTo(fullTableName2.hashCode())));
+    }
+
+    @Test
     public void testEqualsWithNull() {
         FullTableName fullTableName1 = new FullTableName.Builder()
                 .withSchema("schema1")
                 .withTableName("table1")
                 .build();
-        assertThat(fullTableName1, is(not(equalTo(nullValue()))));
+        assertThat(fullTableName1.equals(null), is(false));
     }
 
     @Test
