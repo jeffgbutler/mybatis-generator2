@@ -9,8 +9,8 @@ public class EnumDefinition extends AbstractTypeOrEnum<EnumDefinition> {
     private List<EnumConstantDefinition> enumConstantDefinitions = new ArrayList<>();
     private List<ConstructorDefinition> constructorDefinitions = new ArrayList<>();
     
-    private EnumDefinition() {
-        super();
+    private EnumDefinition(String name) {
+        super(name);
     }
     
     public Stream<EnumConstantDefinition> enumConstants() {
@@ -58,7 +58,7 @@ public class EnumDefinition extends AbstractTypeOrEnum<EnumDefinition> {
 
     @Override
     public EnumDefinition deepCopy() {
-        return new Builder(name)
+        return new Builder(getName())
                 .withJavaDoc(javaDoc == null ? null : javaDoc.deepCopy())
                 .withModifiers(modifiers.stream())
                 .withSuperInterfaces(superInterfaces())
@@ -73,15 +73,15 @@ public class EnumDefinition extends AbstractTypeOrEnum<EnumDefinition> {
     }
     
     public static class Builder extends AbstractTypeOrEnumBuilder<Builder, EnumDefinition> {
-        private EnumDefinition enumDefinition = new EnumDefinition();
+        private EnumDefinition enumDefinition;
         
         public Builder(String name) {
-            enumDefinition.name = name;
+            enumDefinition = new EnumDefinition(name);
         }
         
         public Builder withConstructor(ConstructorDefinition constructor) {
             constructor.parent = enumDefinition;
-            constructor.name = enumDefinition.name;
+            constructor.name = enumDefinition.getName();
             enumDefinition.constructorDefinitions.add(constructor);
             return this;
         }

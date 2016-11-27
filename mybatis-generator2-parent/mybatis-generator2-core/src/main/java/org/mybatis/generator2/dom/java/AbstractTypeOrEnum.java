@@ -11,11 +11,15 @@ public abstract class AbstractTypeOrEnum<T> extends AbstractJavaElementContainer
 
     protected JavaDoc javaDoc;
     protected Set<JavaModifier> modifiers = new HashSet<>();
-    String name;
+    private String name;
     private List<FieldDefinition> fieldDefinitions = new ArrayList<>();
     private List<MethodDefinition> methodDefinitions = new ArrayList<>();
     private List<String> superInterfaces = new ArrayList<>();
 
+    public AbstractTypeOrEnum(String name) {
+        this.name = name;
+    }
+    
     public Optional<JavaDoc> getJavaDoc() {
         return Optional.ofNullable(javaDoc);
     }

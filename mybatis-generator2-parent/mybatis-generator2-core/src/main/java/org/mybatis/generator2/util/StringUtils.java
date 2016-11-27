@@ -17,4 +17,8 @@ public interface StringUtils {
     static boolean stringContainsSpace(String s) {
         return s != null && s.indexOf(' ') != -1;
     }
+
+    static boolean isTrue(String s) {
+        return "true".equalsIgnoreCase(s); //$NON-NLS-1$
+    }
 }

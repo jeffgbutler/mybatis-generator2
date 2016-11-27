@@ -10,8 +10,8 @@ public class ClassDefinition extends AbstractTypeOrEnum<ClassDefinition> {
     private String superClass;
     private List<ConstructorDefinition> constructorDefinitions = new ArrayList<>();
 
-    private ClassDefinition() {
-        super();
+    private ClassDefinition(String name) {
+        super(name);
     }
     
     public Optional<String> getSuperClass() {
@@ -68,7 +68,7 @@ public class ClassDefinition extends AbstractTypeOrEnum<ClassDefinition> {
     
     @Override
     public ClassDefinition deepCopy() {
-        return new Builder(name)
+        return new Builder(getName())
                 .withJavaDoc(javaDoc == null ? null : javaDoc.deepCopy())
                 .withModifiers(modifiers.stream())
                 .withSuperInterfaces(superInterfaces())
@@ -83,10 +83,10 @@ public class ClassDefinition extends AbstractTypeOrEnum<ClassDefinition> {
     }
 
     public static class Builder extends AbstractTypeOrEnumBuilder<Builder, ClassDefinition> {
-        private ClassDefinition classDefinition = new ClassDefinition();
+        private ClassDefinition classDefinition;
         
         public Builder(String name) {
-            classDefinition.name = name;
+            classDefinition = new ClassDefinition(name);
         }
         
         public Builder withSuperClass(String superClass) {
@@ -96,7 +96,7 @@ public class ClassDefinition extends AbstractTypeOrEnum<ClassDefinition> {
 
         public Builder withConstructor(ConstructorDefinition constructor) {
             constructor.parent = classDefinition;
-            constructor.name = classDefinition.name;
+            constructor.name = classDefinition.getName();
             classDefinition.constructorDefinitions.add(constructor);
             return this;
         }
