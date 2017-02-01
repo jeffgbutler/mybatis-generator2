@@ -12,7 +12,7 @@ public class TextElementTest {
     @Test
     public void testGetters() {
         TextElement te = TextElement.of("select * from foo");
-        assertThat(te.getContent(), equalTo("select * from foo"));
-        assertThat(te.getParent(), is(nullValue()));
+        assertThat(te.content(), equalTo("select * from foo"));
+        assertThat(te.parent(), is(nullValue()));
     }
 }

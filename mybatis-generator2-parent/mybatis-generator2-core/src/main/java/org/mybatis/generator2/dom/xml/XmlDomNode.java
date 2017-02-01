@@ -4,11 +4,11 @@ public abstract class XmlDomNode<T> {
 
     XmlDomNode<?> parent;
     
-    public XmlDomNode<?> getParent() {
+    public XmlDomNode<?> parent() {
         return parent;
     }
     
     public abstract T deepCopy();
     
-    public abstract void accept(XmlDomVisitor visitor);
+    public abstract <S> S accept(XmlDomVisitor<S> visitor);
 }

@@ -44,7 +44,7 @@ public class XmlElement extends AbstractElement<XmlElement> {
         return !children.isEmpty();
     }
 
-    public String getName() {
+    public String name() {
         return name;
     }
 
@@ -53,7 +53,7 @@ public class XmlElement extends AbstractElement<XmlElement> {
                 .withAttributes(attributes())
                 .withAttribute(attribute)
                 .withChildren(children())
-                .withName(getName())
+                .withName(name())
                 .build();
     }
     
@@ -62,16 +62,8 @@ public class XmlElement extends AbstractElement<XmlElement> {
                 .withAttributes(attributes())
                 .withChildren(children())
                 .withChild(child)
-                .withName(getName())
+                .withName(name())
                 .build();
-    }
-    
-    @Override
-    public void accept(XmlDomVisitor visitor) {
-        if (visitor.visit(this)) {
-            attributes.stream().forEach(a -> a.accept(visitor));
-            children.stream().forEach(e -> e.accept(visitor));
-        }
     }
     
     @Override
@@ -81,6 +73,11 @@ public class XmlElement extends AbstractElement<XmlElement> {
                 .withAttributes(attributes().map(Attribute::deepCopy))
                 .withChildren(children().map(AbstractElement::deepCopy))
                 .build();
+    }
+
+    @Override
+    public <S> S accept(XmlDomVisitor<S> visitor) {
+        return visitor.visit(this);
     }
 
     public static XmlElement of(String name) {

@@ -15,25 +15,30 @@ public class DocumentTest {
     @Test
     public void testGetters() {
         Document document = setupDocument();
-        assertThat(document.getPublicId(), is(PUBLIC_ID));
-        assertThat(document.getSystemId(), is(SYSTEM_ID));
+        assertThat(document.externalDTD().isPresent(), is(true));
+        
+        document.externalDTD().ifPresent(dtd -> {
+            assertThat(dtd, is(instanceOf(PublicExternalDTD.class)));
+            assertThat(((PublicExternalDTD) dtd).dtdName(), is(PUBLIC_ID));
+            assertThat(dtd.dtdLocation(), is(SYSTEM_ID));
+        });
     }
     
     @Test
     public void testParentsAreSetCorrectly() {
         Document document = setupDocument();
         
-        assertThat(document.getParent(), is(nullValue()));
+        assertThat(document.parent(), is(nullValue()));
         
-        XmlElement root = document.getRootElement();
-        assertThat(root.getParent(), is(instanceOf(Document.class)));
+        XmlElement root = document.rootElement();
+        assertThat(root.parent(), is(instanceOf(Document.class)));
         
         root.attributes().forEach(a -> {
-            assertThat(a.getParent(), is(root));
+            assertThat(a.parent(), is(root));
         });
 
         root.children().forEach(a -> {
-            assertThat(a.getParent(), is(root));
+            assertThat(a.parent(), is(root));
         });
     }
 
@@ -61,7 +66,9 @@ public class DocumentTest {
 
         mapperElement = mapperElement.withChild(selectElement);
         
-        Document document = Document.of(PUBLIC_ID, SYSTEM_ID, mapperElement);
+        PublicExternalDTD dtd = PublicExternalDTD.of(PUBLIC_ID, SYSTEM_ID);
+        
+        Document document = Document.of(dtd, mapperElement);
         return document;
     }
 }

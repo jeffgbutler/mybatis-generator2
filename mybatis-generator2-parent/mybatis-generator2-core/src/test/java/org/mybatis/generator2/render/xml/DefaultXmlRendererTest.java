@@ -46,7 +46,7 @@ public class DefaultXmlRendererTest {
     public void testEmptyDocument2() {
         XmlElement rootElement = XmlElement.of("root");
         rootElement = rootElement.withAttribute(Attribute.of("foo", "bar"));
-        Document document = Document.of("some id", null, rootElement);
+        Document document = Document.of(rootElement);
 
         DefaultXmlRenderer renderer = DefaultXmlRenderer.of(document);
         String content = renderer.render();

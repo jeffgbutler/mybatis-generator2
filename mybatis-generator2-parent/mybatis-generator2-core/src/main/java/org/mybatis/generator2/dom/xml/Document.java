@@ -15,51 +15,53 @@
  */
 package org.mybatis.generator2.dom.xml;
 
+import java.util.Optional;
+
 /**
  * @author Jeff Butler
  */
 public class Document extends XmlDomNode<Document> {
     
-    private String publicId;
-    private String systemId;
     private XmlElement rootElement;
+    private ExternalDTD<?> externalDTD;
 
     private Document() {
         super();
     }
 
-    public XmlElement getRootElement() {
+    public XmlElement rootElement() {
         return rootElement;
     }
-
-    public String getPublicId() {
-        return publicId;
-    }
-
-    public String getSystemId() {
-        return systemId;
-    }
-
-    @Override
-    public void accept(XmlDomVisitor visitor) {
-        if (visitor.visit(this)) {
-            rootElement.accept(visitor);
-        }
-    }
     
+    public Optional<ExternalDTD<?>> externalDTD() {
+        return Optional.ofNullable(externalDTD);
+    }
+
     @Override
     public Document deepCopy() {
-        return Document.of(publicId, systemId, rootElement.deepCopy());
+        if (externalDTD == null) {
+            return Document.of(rootElement.deepCopy());
+        } else {
+            return Document.of(externalDTD.deepCopy(), rootElement.deepCopy());
+        }
+    }
+
+    @Override
+    public <S> S accept(XmlDomVisitor<S> visitor) {
+        return visitor.visit(this);
     }
 
     public static Document of(XmlElement rootElement) {
-        return of(null, null, rootElement);
+        Document document = new Document();
+        document.rootElement = rootElement;
+        document.rootElement.parent = document;
+        return document;
     }
     
-    public static Document of(String publicId, String systemId, XmlElement rootElement) {
+    public static Document of(ExternalDTD<?> externalDTD, XmlElement rootElement) {
         Document document = new Document();
-        document.publicId = publicId;
-        document.systemId = systemId;
+        document.externalDTD = externalDTD;
+        document.externalDTD.parent = document;
         document.rootElement = rootElement;
         document.rootElement.parent = document;
         return document;

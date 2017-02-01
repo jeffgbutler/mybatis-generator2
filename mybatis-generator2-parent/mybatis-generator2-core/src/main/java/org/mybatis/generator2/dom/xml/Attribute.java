@@ -24,17 +24,12 @@ public class Attribute extends XmlDomNode<Attribute> implements Comparable<Attri
         super();
     }
 
-    public String getName() {
+    public String name() {
         return name;
     }
 
-    public String getValue() {
+    public String value() {
         return value;
-    }
-
-    @Override
-    public void accept(XmlDomVisitor visitor) {
-        visitor.visit(this);
     }
 
     @Override
@@ -88,6 +83,11 @@ public class Attribute extends XmlDomNode<Attribute> implements Comparable<Attri
         }
     }
     
+    @Override
+    public <S> S accept(XmlDomVisitor<S> visitor) {
+        return visitor.visit(this);
+    }
+
     public static Attribute of(String name, String value) {
         Attribute attribute = new Attribute();
         attribute.name = name;

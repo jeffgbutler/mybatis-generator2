@@ -11,8 +11,8 @@ public class AttributeTest {
     @Test
     public void testGetters() {
         Attribute a1 = Attribute.of("resultType", "foo.Bar");
-        assertThat(a1.getName(), equalTo("resultType"));
-        assertThat(a1.getValue(), equalTo("foo.Bar"));
+        assertThat(a1.name(), equalTo("resultType"));
+        assertThat(a1.value(), equalTo("foo.Bar"));
     }
 
     @Test

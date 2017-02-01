@@ -1,20 +1,27 @@
 package org.mybatis.generator2.dom.xml;
 
-public interface XmlDomVisitor {
-
-    default void visit(Attribute attribute) {
-        return;
+public interface XmlDomVisitor<T> {
+    default T visit(Attribute element) {
+        return null;
+    }
+    
+    default T visit(Document document) {
+        return null;
     }
 
-    default boolean visit(Document document) {
-        return true;
+    default T visit(PublicExternalDTD publicExternalDTD) {
+        return null;
     }
 
-    default void visit(TextElement textElement) {
-        return;
+    default T visit(SystemExternalDTD systemExternalDTD) {
+        return null;
     }
-
-    default boolean visit(XmlElement xmlElement) {
-        return true;
+    
+    default T visit(TextElement textElement) {
+        return null;
+    }
+    
+    default T visit(XmlElement xmlElement) {
+        return null;
     }
 }

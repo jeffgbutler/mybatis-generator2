@@ -1,14 +1,21 @@
 package org.mybatis.generator2.render.xml;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.mybatis.generator2.dom.xml.Attribute;
 import org.mybatis.generator2.dom.xml.Document;
+import org.mybatis.generator2.dom.xml.PublicExternalDTD;
+import org.mybatis.generator2.dom.xml.SystemExternalDTD;
 import org.mybatis.generator2.dom.xml.TextElement;
-import org.mybatis.generator2.dom.xml.XmlDomVisitor;
 import org.mybatis.generator2.dom.xml.XmlElement;
-import org.mybatis.generator2.render.OutputUtilities;
+import org.mybatis.generator2.dom.xml.XmlDomVisitor;
 
 public class DefaultXmlRenderer {
 
+    private static final String XML_DECLARATION = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"; //$NON-NLS-1$
     private Document document;
 
     private DefaultXmlRenderer() {
@@ -16,10 +23,7 @@ public class DefaultXmlRenderer {
     }
 
     public String render() {
-        // we do this so the render method can be called
-        // repeatedly.  This way we don't have to reset the
-        // indentation level and buffer on each call.
-        return new Renderer(document).render();
+        return document.accept(new StringVisitor());
     }
 
     public static DefaultXmlRenderer of(Document document) {
@@ -27,99 +31,97 @@ public class DefaultXmlRenderer {
         defaultXmlRenderer.document = document;
         return defaultXmlRenderer;
     }
-
-    private static class Renderer implements XmlDomVisitor, OutputUtilities {
-        private StringBuilder buffer = new StringBuilder();
-        private int indentLevel = 0;
-        private Document document;
-        
-        public Renderer(Document document) {
-            this.document = document;
+    
+    private static class StreamVisitor implements XmlDomVisitor<Stream<String>> {
+        @Override
+        public Stream<String> visit(XmlElement xmlElement) {
+            if (xmlElement.hasChildren()) {
+                return renderXmlElementWithChildren(xmlElement).stream();
+            } else {
+                return Stream.of(renderXmlElementWithoutChildren(xmlElement));
+            }
         }
         
-        public String render() {
-            document.accept(this);
+        @Override
+        public Stream<String> visit(TextElement textElement) {
+            return Stream.of(textElement.content());
+        }
+
+        private List<String> renderXmlElementWithChildren(XmlElement xmlElement) {
+            List<String> strings = new ArrayList<>();
+
+            strings.add(renderStartTag(xmlElement));
+            strings.addAll(
+                    xmlElement.children()
+                    .flatMap(c -> c.accept(this))
+                    .map(this::indent)
+                    .collect(Collectors.toList()));
+            strings.add(renderEndTag(xmlElement));
+            
+            return strings;
+        }
+
+        private String renderXmlElementWithoutChildren(XmlElement xmlElement) {
+            return String.format("<%s%s />", xmlElement.name(), renderAttributes(xmlElement.attributes())); //$NON-NLS-1$
+        }
+
+        private String indent(String s) {
+            return "  " + s; //$NON-NLS-1$
+        }
+        
+        private String renderStartTag(XmlElement xmlElement) {
+            return String.format("<%s%s>", xmlElement.name(), renderAttributes(xmlElement.attributes())); //$NON-NLS-1$
+        }
+        
+        private String renderEndTag(XmlElement xmlElement) {
+            return String.format("</%s>", xmlElement.name()); //$NON-NLS-1$
+        }
+
+        private String renderAttributes(Stream<Attribute> attributes) {
+            return attributes
+                    .sorted()
+                    .map(this::renderAttribute)
+                    .collect(Collectors.joining(" ", " ", "")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        }
+
+        private String renderAttribute(Attribute attribute) {
+            return String.format("%s=\"%s\"", attribute.name(), attribute.value()); //$NON-NLS-1$
+        }
+    }
+    
+    private static class StringVisitor implements XmlDomVisitor<String> {
+        @Override
+        public String visit(Document document) {
+            List<String> strings = new ArrayList<>();
+            strings.add(XML_DECLARATION);
+            strings.add(renderDocType(document));
+            strings.addAll(document.rootElement().accept(new StreamVisitor()).collect(Collectors.toList()));
+            
+            return strings.stream().collect(Collectors.joining(System.lineSeparator()));
+        }
+        
+        private String renderDocType(Document document) {
+            StringBuilder buffer = new StringBuilder();
+            buffer.append("<!DOCTYPE "); //$NON-NLS-1$
+            buffer.append(document.rootElement().name());
+            
+            document.externalDTD().ifPresent(dtd -> {
+                buffer.append(' ');
+                buffer.append(dtd.accept(this));
+            });
+
+            buffer.append('>');
             return buffer.toString();
         }
         
         @Override
-        public void visit(Attribute attribute) {
-            buffer.append(' ');
-            buffer.append(attribute.getName());
-            buffer.append("=\""); //$NON-NLS-1$
-            buffer.append(attribute.getValue());
-            buffer.append('\"');
+        public String visit(PublicExternalDTD dtd) {
+            return String.format("PUBLIC \"%s\" \"%s\"", dtd.dtdName(), dtd.dtdLocation()); //$NON-NLS-1$
         }
 
         @Override
-        public boolean visit(Document document) {
-            buffer.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"); //$NON-NLS-1$
-
-            newLine(buffer);
-            buffer.append("<!DOCTYPE "); //$NON-NLS-1$
-            buffer.append(document.getRootElement().getName());
-
-            if (document.getPublicId() != null && document.getSystemId() != null) {
-                buffer.append(" PUBLIC \""); //$NON-NLS-1$
-                buffer.append(document.getPublicId());
-                buffer.append("\" \""); //$NON-NLS-1$
-                buffer.append(document.getSystemId());
-                buffer.append('\"');
-            }
-            buffer.append('>');
-
-            return true;
-        }
-
-        @Override
-        public void visit(TextElement textElement) {
-            newLine(buffer);
-            xmlIndent(buffer, indentLevel);
-            buffer.append(textElement.getContent());
-        }
-
-        @Override
-        public boolean visit(XmlElement xmlElement) {
-
-            if (xmlElement.hasChildren()) {
-                visitElementWithChildren(xmlElement);
-            } else {
-                visitElementWithoutChildren(xmlElement);
-            }
-
-            return false;
-        }
-
-        private void visitElementWithChildren(XmlElement xmlElement) {
-            newLine(buffer);
-            xmlIndent(buffer, indentLevel);
-            buffer.append('<');
-            buffer.append(xmlElement.getName());
-            xmlElement.attributes().sorted().forEach(a -> a.accept(this));
-            buffer.append('>');
-
-            visitChildren(xmlElement);
-
-            newLine(buffer);
-            xmlIndent(buffer, indentLevel);
-            buffer.append("</"); //$NON-NLS-1$
-            buffer.append(xmlElement.getName());
-            buffer.append('>');
-        }
-
-        private void visitChildren(XmlElement xmlElement) {
-            indentLevel++;
-            xmlElement.children().forEach(e -> e.accept(this));
-            indentLevel--;
-        }
-
-        private void visitElementWithoutChildren(XmlElement xmlElement) {
-            newLine(buffer);
-            xmlIndent(buffer, indentLevel);
-            buffer.append('<');
-            buffer.append(xmlElement.getName());
-            xmlElement.attributes().sorted().forEach(a -> a.accept(this));
-            buffer.append(" />"); //$NON-NLS-1$
+        public String visit(SystemExternalDTD dtd) {
+            return String.format("SYSTEM \"%s\"", dtd.dtdLocation()); //$NON-NLS-1$
         }
     }
 }

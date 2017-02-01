@@ -23,21 +23,20 @@ public class TextElement extends AbstractElement<TextElement> {
         super();
     }
 
-    public String getContent() {
+    public String content() {
         return content;
     }
 
     @Override
-    public void accept(XmlDomVisitor visitor) {
-        visitor.visit(this);
-    }
-
-    @Override
     public TextElement deepCopy() {
-        // no need to make a new copy as all fields are immutable
-        return this;
+        return TextElement.of(content);
     }
     
+    @Override
+    public <S> S accept(XmlDomVisitor<S> visitor) {
+        return visitor.visit(this);
+    }
+
     public static TextElement of(String content) {
         TextElement textElement = new TextElement();
         textElement.content = content;
