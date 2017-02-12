@@ -92,36 +92,25 @@ public class DefaultXmlRenderer {
     private static class StringVisitor implements XmlDomVisitor<String> {
         @Override
         public String visit(Document document) {
-            List<String> strings = new ArrayList<>();
-            strings.add(XML_DECLARATION);
-            strings.add(renderDocType(document));
-            strings.addAll(document.rootElement().accept(new StreamVisitor()).collect(Collectors.toList()));
-            
-            return strings.stream().collect(Collectors.joining(System.lineSeparator()));
+            return Stream.concat(Stream.of(XML_DECLARATION, renderDocType(document)),
+                    document.rootElement().accept(new StreamVisitor()))
+                    .collect(Collectors.joining(System.lineSeparator()));
         }
         
         private String renderDocType(Document document) {
-            StringBuilder buffer = new StringBuilder();
-            buffer.append("<!DOCTYPE "); //$NON-NLS-1$
-            buffer.append(document.rootElement().name());
-            
-            document.externalDTD().ifPresent(dtd -> {
-                buffer.append(' ');
-                buffer.append(dtd.accept(this));
-            });
-
-            buffer.append('>');
-            return buffer.toString();
+            return Stream.of(document.rootElement().name(),
+                    document.externalDTD().map(dtd -> dtd.accept(this)).orElse("")) //$NON-NLS-1$
+                .collect(Collectors.joining("", "<!DOCTYPE ", ">")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
         
         @Override
         public String visit(PublicExternalDTD dtd) {
-            return String.format("PUBLIC \"%s\" \"%s\"", dtd.dtdName(), dtd.dtdLocation()); //$NON-NLS-1$
+            return String.format(" PUBLIC \"%s\" \"%s\"", dtd.dtdName(), dtd.dtdLocation()); //$NON-NLS-1$
         }
 
         @Override
         public String visit(SystemExternalDTD dtd) {
-            return String.format("SYSTEM \"%s\"", dtd.dtdLocation()); //$NON-NLS-1$
+            return String.format(" SYSTEM \"%s\"", dtd.dtdLocation()); //$NON-NLS-1$
         }
     }
 }
