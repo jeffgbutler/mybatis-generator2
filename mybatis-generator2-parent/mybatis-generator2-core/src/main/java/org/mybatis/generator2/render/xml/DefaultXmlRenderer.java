@@ -2,11 +2,14 @@ package org.mybatis.generator2.render.xml;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.mybatis.generator2.dom.xml.AbstractElement;
 import org.mybatis.generator2.dom.xml.Attribute;
 import org.mybatis.generator2.dom.xml.Document;
+import org.mybatis.generator2.dom.xml.ExternalDTD;
 import org.mybatis.generator2.dom.xml.PublicExternalDTD;
 import org.mybatis.generator2.dom.xml.SystemExternalDTD;
 import org.mybatis.generator2.dom.xml.TextElement;
@@ -53,16 +56,23 @@ public class DefaultXmlRenderer {
             strings.add(renderStartTag(xmlElement));
             strings.addAll(
                     xmlElement.children()
-                    .flatMap(c -> c.accept(this))
+                    .flatMap(this::renderChildElement)
                     .map(this::indent)
                     .collect(Collectors.toList()));
             strings.add(renderEndTag(xmlElement));
             
             return strings;
         }
+        
+        private Stream<String> renderChildElement(AbstractElement<?> abstractElement) {
+            return abstractElement.accept(this);
+        }
 
         private String renderXmlElementWithoutChildren(XmlElement xmlElement) {
-            return String.format("<%s%s />", xmlElement.name(), renderAttributes(xmlElement.attributes())); //$NON-NLS-1$
+            return "<" //$NON-NLS-1$
+                    + xmlElement.name()
+                    + renderAttributes(xmlElement.attributes())
+                    + " />"; //$NON-NLS-1$
         }
 
         private String indent(String s) {
@@ -70,11 +80,16 @@ public class DefaultXmlRenderer {
         }
         
         private String renderStartTag(XmlElement xmlElement) {
-            return String.format("<%s%s>", xmlElement.name(), renderAttributes(xmlElement.attributes())); //$NON-NLS-1$
+            return "<" //$NON-NLS-1$
+                    + xmlElement.name()
+                    + renderAttributes(xmlElement.attributes())
+                    + ">"; //$NON-NLS-1$
         }
         
         private String renderEndTag(XmlElement xmlElement) {
-            return String.format("</%s>", xmlElement.name()); //$NON-NLS-1$
+            return "</" //$NON-NLS-1$
+                    + xmlElement.name()
+                    + ">"; //$NON-NLS-1$
         }
 
         private String renderAttributes(Stream<Attribute> attributes) {
@@ -85,32 +100,49 @@ public class DefaultXmlRenderer {
         }
 
         private String renderAttribute(Attribute attribute) {
-            return String.format("%s=\"%s\"", attribute.name(), attribute.value()); //$NON-NLS-1$
+            return attribute.name()
+                    + "=\"" //$NON-NLS-1$
+                    + attribute.value()
+                    + "\""; //$NON-NLS-1$
         }
     }
     
     private static class StringVisitor implements XmlDomVisitor<String> {
         @Override
         public String visit(Document document) {
-            return Stream.concat(Stream.of(XML_DECLARATION, renderDocType(document)),
-                    document.rootElement().accept(new StreamVisitor()))
+            return XML_DECLARATION
+                    + System.lineSeparator()
+                    + renderDocType(document)
+                    + System.lineSeparator()
+                    + document.rootElement().accept(new StreamVisitor())
                     .collect(Collectors.joining(System.lineSeparator()));
         }
         
         private String renderDocType(Document document) {
-            return Stream.of(document.rootElement().name(),
-                    document.externalDTD().map(dtd -> dtd.accept(this)).orElse("")) //$NON-NLS-1$
-                .collect(Collectors.joining("", "<!DOCTYPE ", ">")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            StringJoiner sj = new StringJoiner("", "<!DOCTYPE ", ">"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            sj.add(document.rootElement().name());
+            sj.add(document.externalDTD().map(this::renderExternalDTD).orElse("")); //$NON-NLS-1$
+            return sj.toString();
+        }
+        
+        private String renderExternalDTD(ExternalDTD<?> externalDTD) {
+            return externalDTD.accept(this);
         }
         
         @Override
         public String visit(PublicExternalDTD dtd) {
-            return String.format(" PUBLIC \"%s\" \"%s\"", dtd.dtdName(), dtd.dtdLocation()); //$NON-NLS-1$
+            return " PUBLIC \"" //$NON-NLS-1$
+                    + dtd.dtdName()
+                    + "\" \"" //$NON-NLS-1$
+                    + dtd.dtdLocation()
+                    + "\""; //$NON-NLS-1$
         }
 
         @Override
         public String visit(SystemExternalDTD dtd) {
-            return String.format(" SYSTEM \"%s\"", dtd.dtdLocation()); //$NON-NLS-1$
+            return " SYSTEM \"" //$NON-NLS-1$
+                    + dtd.dtdLocation()
+                    + "\""; //$NON-NLS-1$
         }
     }
 }
